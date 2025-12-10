@@ -16,88 +16,69 @@ type ModelProps = {
   fallbackColor?: string;
 };
 
-function convertToStandardMaterial(
-  material: THREE.Material
-): THREE.MeshStandardMaterial {
+function toStandardMaterial(material: THREE.Material): THREE.Material {
   if (material instanceof THREE.MeshStandardMaterial) {
-    return material;
+    const clone = material.clone();
+    clone.needsUpdate = true;
+    return clone;
   }
 
-  const color =
-    "color" in material
-      ? ((material as THREE.Material & { color?: THREE.Color }).color ?? null)
-      : null;
-  const emissive =
-    "emissive" in material
-      ? ((material as THREE.Material & { emissive?: THREE.Color }).emissive ?? null)
-      : null;
-  const emissiveIntensity =
-    "emissiveIntensity" in material
-      ? ((material as THREE.Material & { emissiveIntensity?: number }).emissiveIntensity ?? undefined)
-      : undefined;
-  const map =
-    "map" in material
-      ? ((material as THREE.Material & { map?: THREE.Texture | null }).map ?? null)
-      : null;
-  const normalMap =
-    "normalMap" in material
-      ? ((material as THREE.Material & { normalMap?: THREE.Texture | null }).normalMap ?? null)
-      : null;
-  const roughness =
-    "roughness" in material
-      ? (material as THREE.Material & { roughness?: number }).roughness
-      : undefined;
-  const metalness =
-    "metalness" in material
-      ? (material as THREE.Material & { metalness?: number }).metalness
-      : undefined;
-  const flatShading =
-    "flatShading" in material
-      ? Boolean((material as THREE.Material & { flatShading?: boolean }).flatShading)
-      : false;
-  const vertexColors =
-    "vertexColors" in material
-      ? Boolean((material as THREE.Material & { vertexColors?: boolean }).vertexColors)
-      : false;
+  const hasMetalness = material as THREE.Material & { metalness?: number };
+  const hasRoughness = material as THREE.Material & { roughness?: number };
+  const hasColor = material as THREE.Material & { color?: THREE.Color };
+  const hasEmissive = material as THREE.Material & { emissive?: THREE.Color };
+  const hasMap = material as THREE.Material & {
+    map?: THREE.Texture | null;
+    normalMap?: THREE.Texture | null;
+    alphaMap?: THREE.Texture | null;
+  };
 
   const standard = new THREE.MeshStandardMaterial({
-    color: color ? color.clone() : new THREE.Color("#ffffff"),
-    map: map ?? undefined,
-    metalness: metalness ?? 0.15,
-    roughness: roughness ?? 0.55,
+    color:
+      hasColor.color instanceof THREE.Color
+        ? hasColor.color.clone()
+        : new THREE.Color("#cccccc"),
+    metalness:
+      typeof hasMetalness.metalness === "number"
+        ? hasMetalness.metalness ?? 0.2
+        : 0.2,
+    roughness:
+      typeof hasRoughness.roughness === "number"
+        ? hasRoughness.roughness ?? 0.55
+        : 0.55,
+    transparent: material.transparent ?? false,
+    opacity: material.opacity ?? 1,
+    side: material.side ?? THREE.FrontSide,
   });
 
-  if (normalMap) {
-    standard.normalMap = normalMap;
+  if (hasEmissive.emissive instanceof THREE.Color) {
+    standard.emissive.copy(hasEmissive.emissive);
   }
 
-  standard.side = material.side;
-  standard.transparent = material.transparent ?? false;
-  standard.opacity = material.opacity ?? 1;
-  if ("alphaTest" in material) {
-    standard.alphaTest = (material as THREE.Material & { alphaTest?: number }).alphaTest ?? 0;
+  if (hasMap.map) {
+    const texture = hasMap.map;
+    standard.map = texture;
+    texture.needsUpdate = true;
   }
 
-  standard.flatShading = flatShading;
-  standard.vertexColors = vertexColors;
-
-  if (emissive) {
-    standard.emissive.copy(emissive);
-    if (typeof emissiveIntensity === "number") {
-      standard.emissiveIntensity = emissiveIntensity;
-    }
+  if (hasMap.normalMap) {
+    const texture = hasMap.normalMap;
+    standard.normalMap = texture;
+    texture.needsUpdate = true;
   }
 
-  if (standard.map) {
-    standard.map.needsUpdate = true;
-  }
-  if (standard.normalMap) {
-    standard.normalMap.needsUpdate = true;
+  if (hasMap.alphaMap) {
+    const texture = hasMap.alphaMap;
+    standard.alphaMap = texture;
+    standard.transparent = true;
+    texture.needsUpdate = true;
   }
 
-  standard.name = material.name;
+  if (material.name) {
+    standard.name = material.name;
+  }
+
   standard.needsUpdate = true;
-
   return standard;
 }
 
@@ -146,11 +127,9 @@ function ModelWithMaterials({ src, mtlSrc }: { src: string; mtlSrc: string }) {
   obj.traverse((child: THREE.Object3D) => {
     if (child instanceof THREE.Mesh) {
       if (Array.isArray(child.material)) {
-        child.material = child.material.map((mat) =>
-          convertToStandardMaterial(mat)
-        );
+        child.material = child.material.map((mat) => toStandardMaterial(mat));
       } else if (child.material) {
-        child.material = convertToStandardMaterial(child.material);
+        child.material = toStandardMaterial(child.material);
       }
       child.castShadow = false;
       child.receiveShadow = false;
@@ -196,6 +175,7 @@ export default function ObjViewer({
         key={`${src}-${mtlSrc ?? "default"}`}
         camera={{ position: [2.5, 2, 2], fov: 45 }}
         shadows={false}
+        gl={{ outputColorSpace: THREE.SRGBColorSpace }}
         style={{ background }}
       >
         {/* Lighting */}
