@@ -70,6 +70,278 @@ function initialsFromName(name: string): string {
   return `${first}${second}`.toUpperCase();
 }
 
+const ACCENT_COLORS = [
+  "#7fffd4",
+  "#7ab8ff",
+  "#ff9bf6",
+  "#ffe58a",
+  "#ff8f76",
+  "#9d8eff",
+  "#7dffb5",
+  "#ffc49b",
+  "#9fe5ff",
+  "#ffa2c2",
+  "#a4ffdd",
+  "#ffd4a8",
+];
+
+const REACTIVE_VARIANTS = [
+  "lift",
+  "tilt",
+  "slide",
+  "pulse",
+  "ripple",
+  "swing",
+  "prism",
+] as const;
+
+type ReactiveVariant = (typeof REACTIVE_VARIANTS)[number];
+
+function hashStringToInt(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function accentFromKey(key: string): string {
+  const hash = hashStringToInt(key);
+  return ACCENT_COLORS[hash % ACCENT_COLORS.length];
+}
+
+function variantFromKey(key: string): ReactiveVariant {
+  const hash = hashStringToInt(`${key}-variant`);
+  return REACTIVE_VARIANTS[hash % REACTIVE_VARIANTS.length];
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const normalized = hex.replace("#", "");
+  const bigint = parseInt(normalized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+type ScrollReactiveCardProps = React.ComponentProps<typeof Card> & {
+  accentKey: string;
+  accentColor?: string;
+  variant?: ReactiveVariant;
+};
+
+function getVariantStyles(
+  variant: ReactiveVariant,
+  accent: string,
+  active: boolean
+) {
+  const glowStrong = hexToRgba(accent, active ? 0.32 : 0.18);
+  switch (variant) {
+    case "tilt":
+      return {
+        transform: active
+          ? "translateY(-14px) rotateX(6deg) rotateY(-3deg)"
+          : "translateY(20px) rotateX(10deg) rotateY(-6deg)",
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: active ? "10%" : "18%",
+          borderRadius: 28,
+          opacity: active ? 0.6 : 0,
+          border: `1px solid ${hexToRgba(accent, active ? 0.5 : 0.22)}`,
+          boxShadow: active ? `0 0 55px ${glowStrong}` : "none",
+          transition: "all 0.7s var(--gg-curve)",
+        },
+      } as const;
+    case "slide":
+      return {
+        transform: active
+          ? "translateY(-14px) translateX(8px)"
+          : "translateY(20px) translateX(-14px)",
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(120deg, transparent 0%, ${hexToRgba(
+            accent,
+            active ? 0.18 : 0
+          )} 45%, transparent 90%)`,
+          mixBlendMode: "screen",
+          opacity: active ? 1 : 0,
+          transform: active ? "translateX(0)" : "translateX(-25%)",
+          transition: "all 0.7s var(--gg-curve)",
+        },
+      } as const;
+    case "pulse":
+      return {
+        transform: active ? "translateY(-16px) scale(1.02)" : "translateY(20px)",
+        boxShadow: active
+          ? `0 28px 65px ${hexToRgba(accent, 0.28)}`
+          : `0 0 0 ${hexToRgba(accent, 0.0)}`,
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: "-30%",
+          borderRadius: "50%",
+          border: `2px solid ${hexToRgba(accent, active ? 0.45 : 0.15)}`,
+          opacity: active ? 0.55 : 0,
+          transition: "opacity 0.7s var(--gg-curve)",
+        },
+      } as const;
+    case "ripple":
+      return {
+        transform: active ? "translateY(-10px) scale(1.015)" : "translateY(18px)",
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: "-15%",
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${hexToRgba(
+            accent,
+            active ? 0.28 : 0.12
+          )} 0%, transparent 65%)`,
+          opacity: active ? 0.75 : 0,
+          filter: "blur(12px)",
+          transition: "opacity 0.7s var(--gg-curve)",
+        },
+      } as const;
+    case "swing":
+      return {
+        transform: active
+          ? "translateY(-12px) rotateZ(-2deg)"
+          : "translateY(20px) rotateZ(3deg)",
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: "8%",
+          borderRadius: 24,
+          border: `1px dashed ${hexToRgba(accent, active ? 0.5 : 0.2)}`,
+          opacity: active ? 0.7 : 0,
+          transform: active ? "rotateZ(0deg)" : "rotateZ(6deg)",
+          transition: "all 0.7s var(--gg-curve)",
+        },
+      } as const;
+    case "prism":
+      return {
+        transform: active ? "translateY(-14px)" : "translateY(18px)",
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(135deg, ${hexToRgba(
+            accent,
+            active ? 0.35 : 0
+          )} 0%, transparent 45%, ${hexToRgba(accent, active ? 0.22 : 0)} 70%, transparent 100%)`,
+          opacity: active ? 1 : 0,
+          mixBlendMode: "screen",
+          transition: "opacity 0.7s var(--gg-curve)",
+        },
+      } as const;
+    default:
+      return {
+        transform: active ? "translateY(-12px)" : "translateY(20px)",
+        "&::after": {
+          content: "\"\"",
+          position: "absolute",
+          inset: active ? "6%" : "12%",
+          borderRadius: 24,
+          border: `1px solid ${hexToRgba(accent, active ? 0.35 : 0.15)}`,
+          opacity: active ? 0.5 : 0,
+          transition: "all 0.6s var(--gg-curve)",
+        },
+      } as const;
+  }
+}
+
+function ScrollReactiveCard({
+  accentKey,
+  accentColor,
+  variant,
+  children,
+  sx,
+  ...cardProps
+}: ScrollReactiveCardProps) {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = React.useState(false);
+
+  React.useEffect(() => {
+    const node = ref.current;
+    if (!node) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setActive(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const accent = React.useMemo(
+    () => accentColor ?? accentFromKey(accentKey),
+    [accentColor, accentKey]
+  );
+
+  const resolvedVariant = React.useMemo(
+    () => variant ?? variantFromKey(accentKey),
+    [variant, accentKey]
+  );
+
+  const baseStyles = React.useMemo(() => {
+    const glowSoft = hexToRgba(accent, active ? 0.38 : 0.08);
+    return {
+      position: "relative",
+      overflow: "hidden",
+      borderRadius: 3,
+      border: `1px solid ${active ? hexToRgba(accent, 0.45) : "rgba(255,255,255,0.08)"}`,
+      transition: "transform 0.75s var(--gg-curve), border-color 0.6s var(--gg-curve), box-shadow 0.75s var(--gg-curve), background 0.75s var(--gg-curve)",
+      boxShadow: active ? `0 32px 55px ${hexToRgba(accent, 0.26)}` : "0 0 0 rgba(0,0,0,0)",
+      background: active
+        ? `linear-gradient(160deg, ${hexToRgba(accent, 0.18)} 0%, rgba(9,11,25,0.96) 70%)`
+        : undefined,
+      "--gg-curve": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "&::before": {
+        content: "\"\"",
+        position: "absolute",
+        inset: "-40% -18%",
+        background: `radial-gradient(circle at top, ${glowSoft}, transparent 55%)`,
+        opacity: active ? 1 : 0,
+        transition: "opacity 0.75s var(--gg-curve)",
+        pointerEvents: "none",
+      },
+      "&::after": {
+        pointerEvents: "none",
+      },
+    } as const;
+  }, [accent, active]);
+
+  const variantStyles = React.useMemo(
+    () => getVariantStyles(resolvedVariant, accent, active),
+    [resolvedVariant, accent, active]
+  );
+
+  const combinedSx = React.useMemo(() => {
+    const extra = Array.isArray(sx) ? sx : sx ? [sx] : [];
+    return [baseStyles, variantStyles, ...extra];
+  }, [baseStyles, variantStyles, sx]);
+
+  return (
+    <Card ref={ref} sx={combinedSx} {...cardProps}>
+      <Box sx={{ position: "relative", zIndex: 1 }}>{children}</Box>
+    </Card>
+  );
+}
+
 
 // ==================== THEME ====================
 const theme = createTheme({
@@ -552,7 +824,9 @@ export default function Page() {
 
             {/* RIGHT SIDE */}
             <Grid size={{ xs: 12, md: 5 }}>
-              <Card
+              <ScrollReactiveCard
+                accentKey="hero-omron-card"
+                variant="pulse"
                 sx={{
                   borderRadius: 3,
                   overflow: "hidden",
@@ -588,7 +862,7 @@ export default function Page() {
                     wrist-mounted RealSense rig directly in the browser.
                   </Typography>
                 </CardContent>
-              </Card>
+              </ScrollReactiveCard>
             </Grid>
           </Grid>
         </Container>
@@ -606,7 +880,9 @@ export default function Page() {
             Introduction
           </Typography>
 
-          <Card
+          <ScrollReactiveCard
+            accentKey="introduction-problem"
+            variant="lift"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -624,10 +900,12 @@ export default function Page() {
                 And beyond the physical strain, there’s the mental load: figuring out where everything fits in a cluttered, irregular fridge layout. Robots don’t get frustrated by tight spaces or overstuffed shelves — but getting them to understand and navigate those spaces is surprisingly hard.
               </Typography>
             </CardContent>
-          </Card>
+          </ScrollReactiveCard>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card
+              <ScrollReactiveCard
+                accentKey="introduction-solution"
+                variant="slide"
                 sx={{
                   borderRadius: 3,
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -662,10 +940,12 @@ export default function Page() {
                     It’s a complete end-to-end pipeline designed to make a robot genuinely useful in a real household task.
                   </Typography>
                 </CardContent>
-              </Card>
+              </ScrollReactiveCard>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card
+              <ScrollReactiveCard
+                accentKey="introduction-impact"
+                variant="tilt"
                 sx={{
                   borderRadius: 3,
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -700,7 +980,7 @@ export default function Page() {
                     GroceryGizmo is a step toward home robots that make everyday living a little easier — one grocery item at a time.
                   </Typography>
                 </CardContent>
-              </Card>
+              </ScrollReactiveCard>
             </Grid>
           </Grid>
         </Container>
@@ -722,9 +1002,11 @@ export default function Page() {
           </Typography>
 
           <Grid container spacing={3}>
-            {teamMembers.map((m) => (
+            {teamMembers.map((m, index) => (
               <Grid size={{ xs: 12, md: 6 }} key={m.name}>
-                <Card
+                <ScrollReactiveCard
+                  accentKey={`team-${m.name}`}
+                  variant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                   sx={{
                     borderRadius: 3,
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -777,7 +1059,7 @@ export default function Page() {
                       </Typography>
                     </Box>
                   </CardContent>
-                </Card>
+                </ScrollReactiveCard>
               </Grid>
             ))}
           </Grid>
@@ -797,7 +1079,9 @@ export default function Page() {
             Design
           </Typography>
 
-          <Card
+          <ScrollReactiveCard
+            accentKey="design-criteria"
+            variant="slide"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -852,9 +1136,12 @@ export default function Page() {
                   </Typography>
                 </Box>
               </Box>
-              </CardContent>
-              </Card>
-          <Card
+            </CardContent>
+          </ScrollReactiveCard>
+
+          <ScrollReactiveCard
+            accentKey="design-functionality"
+            variant="tilt"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -897,7 +1184,7 @@ export default function Page() {
                 Together, these criteria ensure the robot behaves in a predictable, useful, and safe way — bringing us closer to assistive home robotics that can handle everyday tasks without constant human oversight.
               </Typography>
             </CardContent>
-          </Card>
+          </ScrollReactiveCard>
         </Container>
       </Box>
 
@@ -924,9 +1211,11 @@ export default function Page() {
           </Typography>
 
           <Grid container spacing={3}>
-            {systemArchitectureImages.map((item) => (
+            {systemArchitectureImages.map((item, index) => (
               <Grid key={item.title} size={{ xs: 12, md: 6, lg: 4 }}>
-                <Card
+                <ScrollReactiveCard
+                  accentKey={`system-architecture-${item.title}`}
+                  variant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                   sx={{
                     borderRadius: 3,
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -969,7 +1258,7 @@ export default function Page() {
                       </Typography>
                     </CardContent>
                   </CardActionArea>
-                </Card>
+                </ScrollReactiveCard>
               </Grid>
             ))}
           </Grid>
@@ -993,9 +1282,11 @@ export default function Page() {
           </Typography>
 
           <Grid container spacing={4}>
-            {modelGallery.map((model) => (
+            {modelGallery.map((model, index) => (
               <Grid size={{ xs: 12, md: 4 }} key={model.title}>
-                <Card
+                <ScrollReactiveCard
+                  accentKey={`model-gallery-${model.title}`}
+                  variant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                   sx={{
                     borderRadius: 3,
                     border: "1px solid rgba(255,255,255,0.12)",
@@ -1028,7 +1319,7 @@ export default function Page() {
                       {model.description}
                     </Typography>
                   </CardContent>
-                </Card>
+                </ScrollReactiveCard>
               </Grid>
             ))}
           </Grid>
@@ -1049,7 +1340,9 @@ export default function Page() {
           <Typography sx={{ color: "grey.300", mb: 4, lineHeight: 1.7 }}>
             We validated GroceryGizmo on a countertop-to-fridge workflow with AR-tagged groceries of varying shapes. The system performed full autonomous pick-and-place cycles, logged motion telemetry, and showcased the interaction between perception, planning, and manipulation.
           </Typography>
-          <Card
+          <ScrollReactiveCard
+            accentKey="results-demo"
+            variant="ripple"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -1072,7 +1365,7 @@ export default function Page() {
                 GroceryGizmo Demo Video
               </MuiLink>
             </CardContent>
-          </Card>
+          </ScrollReactiveCard>
         </Container>
       </Box>
 
