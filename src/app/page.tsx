@@ -468,14 +468,14 @@ export default function Page() {
             <Button color="inherit" onClick={() => scrollTo("implementation")} sx={navButtonSx}>
               Implementation
             </Button>
+            <Button color="inherit" onClick={() => scrollTo("conclusion")} sx={navButtonSx}>
+              3D Models
+            </Button>
             <Button color="inherit" onClick={() => scrollTo("results")} sx={navButtonSx}>
               Results
             </Button>
             <Button color="inherit" onClick={() => scrollTo("viewer")} sx={navButtonSx}>
               Conclusion
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("conclusion")} sx={navButtonSx}>
-              3D Models
             </Button>
           </Box>
 
@@ -556,25 +556,36 @@ export default function Page() {
                 sx={{
                   borderRadius: 3,
                   overflow: "hidden",
-                  backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  backdropFilter: "blur(14px)",
+                  border: "1px solid rgba(127,255,212,0.25)",
+                  background: "linear-gradient(160deg, rgba(9,11,25,0.92), rgba(17,20,38,0.92))",
+                  boxShadow: "0 24px 60px rgba(9,11,25,0.45)",
                 }}
               >
-                <Box sx={{ position: "relative", height: 260 }}>
-                  <Image
-                    src="/arm.jpg"
-                    alt="Omron TM5-700 Arm staging groceries"
-                    fill
-                    style={{ objectFit: "cover" }}
+                <Box
+                  sx={{
+                    position: "relative",
+                    height: 320,
+                    background: "radial-gradient(circle at top, rgba(127,255,212,0.25), transparent 55%)",
+                  }}
+                >
+                  <ObjViewer
+                    src="/models/TM5A-700-OMRON.obj"
+                    mtlSrc="/models/TM5A-700-OMRON.mtl"
+                    height={320}
+                    background="transparent"
+                    fallbackColor="#7fffd4"
+                    autoRotateAxis="z"
+                    autoRotateSpeed={0.25}
                   />
                 </Box>
-                <CardContent>
+                <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                     Omron TM5-700 + Robotiq Gripper
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "grey.400", mt: 1 }}>
-                    Industrial hardware deployed in a real kitchen to explore
-                    perception, manipulation, and task-level autonomy.
+                  <Typography variant="body2" sx={{ color: "grey.400", lineHeight: 1.6 }}>
+                    Drag, pinch, and orbit the full TM5 model to explore our workspace clearances and
+                    wrist-mounted RealSense rig directly in the browser.
                   </Typography>
                 </CardContent>
               </Card>
@@ -968,6 +979,65 @@ export default function Page() {
       <Divider />
 
       {/* =========================================== */}
+      {/* 3D MODELS GALLERY */}
+      {/* =========================================== */}
+
+      <Box id="viewer" sx={{ py: 8 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+            3D Models Gallery
+          </Typography>
+          <Typography sx={{ color: "grey.400", mb: 4 }}>
+            Browse the simplified CAD assets we use for workspace layout,
+            storage design, and reach studies inside the planning pipeline.
+          </Typography>
+
+          <Grid container spacing={4}>
+            {modelGallery.map((model) => (
+              <Grid size={{ xs: 12, md: 4 }} key={model.title}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                      background: "rgba(255,255,255,0.02)",
+                    }}
+                  >
+                    <ObjViewer
+                      src={model.src}
+                      mtlSrc={model.mtlSrc}
+                      height={240}
+                      autoRotateAxis="z"
+                      autoRotateSpeed={0.25}
+                    />
+                  </Box>
+
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      {model.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "grey.400" }}>
+                      {model.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      <Divider />
+
+      {/* =========================================== */}
       {/* RESULTS */}
       {/* =========================================== */}
 
@@ -1062,63 +1132,6 @@ export default function Page() {
               </Typography>
             </li>
           </Box>
-        </Container>
-      </Box>
-
-      <Divider />
-
-      {/* =========================================== */}
-      {/* 3D MODELS GALLERY */}
-      {/* =========================================== */}
-
-      <Box id="viewer" sx={{ py: 8 }}>
-        <Container maxWidth="lg">
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
-            3D Models Gallery
-          </Typography>
-          <Typography sx={{ color: "grey.400", mb: 4 }}>
-            Browse the simplified CAD assets we use for workspace layout,
-            storage design, and reach studies inside the planning pipeline.
-          </Typography>
-
-          <Grid container spacing={4}>
-            {modelGallery.map((model) => (
-              <Grid size={{ xs: 12, md: 4 }} key={model.title}>
-                <Card
-                  sx={{
-                    borderRadius: 3,
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      borderBottom: "1px solid rgba(255,255,255,0.08)",
-                      background: "rgba(255,255,255,0.02)",
-                    }}
-                  >
-                    <ObjViewer
-                      src={model.src}
-                      mtlSrc={model.mtlSrc}
-                      height={240}
-                    />
-                  </Box>
-
-                  <CardContent>
-                    <Typography variant="h6" sx={{ mb: 1 }}>
-                      {model.title}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "grey.400" }}>
-                      {model.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
         </Container>
       </Box>
 
