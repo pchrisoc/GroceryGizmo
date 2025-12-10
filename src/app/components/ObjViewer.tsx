@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, Bounds, Center } from "@react-three/drei";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
@@ -16,10 +16,47 @@ type ModelProps = {
   fallbackColor?: string;
 };
 
+type AutoRotateAxis = "x" | "y" | "z";
+
+const MATERIAL_COLOR_MAP: Record<string, string> = {
+  "steel_-_satin": "#9ba3b1",
+  "stainless_steel_-_satin": "#cfd6e3",
+  "opaque(75,75,75)": "#2a2d33",
+  "opaque(10,10,10)": "#0e0f14",
+  "opaque(25,25,25)": "#16181f",
+  "opaque(221,232,255)": "#baceff",
+  "opaque(229,234,237)": "#d1d9e2",
+  "opaque(203,210,239)": "#9fb4ff",
+  "opaque(163,170,173)": "#7b848f",
+  "plastic_-_matte_(red)": "#c44532",
+  "plastic_-_matte_(black)": "#1b1d23",
+  "plastic_-_matte_(white)": "#f1f3f6",
+  "0.231373_0.380392_0.705882_0.000000_0.000000": "#4a70d0",
+  "0.615686_0.811765_0.929412_0.000000_0.000000": "#8fc1ff",
+  "0.647059_0.647059_0.647059_0.000000_0.000000": "#8f979f",
+  "0.972549_0.529412_0.003922_0.000000_0.000000": "#ff8d1f",
+};
+
+function applyMaterialOverrides(material: THREE.MeshStandardMaterial) {
+  const nameKey = material.name?.toLowerCase();
+  if (nameKey && MATERIAL_COLOR_MAP[nameKey]) {
+    material.color.set(MATERIAL_COLOR_MAP[nameKey]);
+  }
+
+  if (!material.color || material.color.getHexString() === "cccccc") {
+    material.color.set("#7f8a94");
+  }
+
+  material.metalness = Math.min(material.metalness ?? 0.2, 0.45);
+  material.roughness = Math.min(Math.max(material.roughness ?? 0.55, 0.35), 0.75);
+  material.needsUpdate = true;
+}
+
 function toStandardMaterial(material: THREE.Material): THREE.Material {
   if (material instanceof THREE.MeshStandardMaterial) {
     const clone = material.clone();
     clone.needsUpdate = true;
+    applyMaterialOverrides(clone);
     return clone;
   }
 
@@ -78,6 +115,7 @@ function toStandardMaterial(material: THREE.Material): THREE.Material {
     standard.name = material.name;
   }
 
+  applyMaterialOverrides(standard);
   standard.needsUpdate = true;
   return standard;
 }
@@ -98,6 +136,7 @@ function ModelWithoutMaterials({
         metalness: 0.2,
         roughness: 0.35,
       });
+      applyMaterialOverrides(child.material as THREE.MeshStandardMaterial);
       child.castShadow = false;
       child.receiveShadow = false;
     }
@@ -151,6 +190,41 @@ function Model({ src, mtlSrc, fallbackColor }: ModelProps) {
   return <ModelWithoutMaterials src={src} fallbackColor={fallbackColor} />;
 }
 
+function AutoRotator({
+  axis = "y",
+  speed = 0.3,
+  children,
+}: {
+  axis?: AutoRotateAxis;
+  speed?: number;
+  children: React.ReactNode;
+}) {
+  const groupRef = React.useRef<THREE.Group>(null);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) {
+      return;
+    }
+
+    if (!speed) {
+      return;
+    }
+
+    const target = groupRef.current.rotation;
+    const deltaRotation = delta * speed;
+
+    if (axis === "x") {
+      target.x += deltaRotation;
+    } else if (axis === "y") {
+      target.y += deltaRotation;
+    } else {
+      target.z += deltaRotation;
+    }
+  });
+
+  return <group ref={groupRef}>{children}</group>;
+}
+
 // --------------------------------------------------------
 // OBJ Viewer Component
 // --------------------------------------------------------
@@ -160,6 +234,8 @@ export type ObjViewerProps = {
   height?: number;
   background?: string;
   fallbackColor?: string;
+  autoRotateAxis?: AutoRotateAxis;
+  autoRotateSpeed?: number;
 };
 
 export default function ObjViewer({
@@ -168,6 +244,8 @@ export default function ObjViewer({
   height = 320,
   background = "#11131f",
   fallbackColor,
+  autoRotateAxis,
+  autoRotateSpeed,
 }: ObjViewerProps) {
   return (
     <div style={{ width: "100%", height }}>
@@ -195,7 +273,13 @@ export default function ObjViewer({
         {/* Load the OBJ */}
         <Suspense fallback={null}>
           <Bounds fit clip observe margin={1.2}>
-            <Model src={src} mtlSrc={mtlSrc} fallbackColor={fallbackColor} />
+            {autoRotateAxis ? (
+              <AutoRotator axis={autoRotateAxis} speed={autoRotateSpeed}>
+                <Model src={src} mtlSrc={mtlSrc} fallbackColor={fallbackColor} />
+              </AutoRotator>
+            ) : (
+              <Model src={src} mtlSrc={mtlSrc} fallbackColor={fallbackColor} />
+            )}
           </Bounds>
         </Suspense>
 

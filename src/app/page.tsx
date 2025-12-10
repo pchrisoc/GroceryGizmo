@@ -468,13 +468,13 @@ export default function Page() {
             <Button color="inherit" onClick={() => scrollTo("implementation")} sx={navButtonSx}>
               Implementation
             </Button>
-            <Button color="inherit" onClick={() => scrollTo("conclusion")} sx={navButtonSx}>
+            <Button color="inherit" onClick={() => scrollTo("viewer")} sx={navButtonSx}>
               3D Models
             </Button>
             <Button color="inherit" onClick={() => scrollTo("results")} sx={navButtonSx}>
               Results
             </Button>
-            <Button color="inherit" onClick={() => scrollTo("viewer")} sx={navButtonSx}>
+            <Button color="inherit" onClick={() => scrollTo("conclusion")} sx={navButtonSx}>
               Conclusion
             </Button>
           </Box>
