@@ -128,7 +128,7 @@ function hexToRgba(hex: string, alpha: number): string {
 type ScrollReactiveCardProps = React.ComponentProps<typeof Card> & {
   accentKey: string;
   accentColor?: string;
-  variant?: ReactiveVariant;
+  effectVariant?: ReactiveVariant;
 };
 
 function getVariantStyles(
@@ -257,7 +257,7 @@ function getVariantStyles(
 function ScrollReactiveCard({
   accentKey,
   accentColor,
-  variant,
+  effectVariant,
   children,
   sx,
   ...cardProps
@@ -293,8 +293,8 @@ function ScrollReactiveCard({
   );
 
   const resolvedVariant = React.useMemo(
-    () => variant ?? variantFromKey(accentKey),
-    [variant, accentKey]
+    () => effectVariant ?? variantFromKey(accentKey),
+    [effectVariant, accentKey]
   );
 
   const baseStyles = React.useMemo(() => {
@@ -826,7 +826,7 @@ export default function Page() {
             <Grid size={{ xs: 12, md: 5 }}>
               <ScrollReactiveCard
                 accentKey="hero-omron-card"
-                variant="pulse"
+                effectVariant="pulse"
                 sx={{
                   borderRadius: 3,
                   overflow: "hidden",
@@ -882,7 +882,7 @@ export default function Page() {
 
           <ScrollReactiveCard
             accentKey="introduction-problem"
-            variant="lift"
+            effectVariant="lift"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -905,7 +905,7 @@ export default function Page() {
             <Grid size={{ xs: 12, md: 6 }}>
               <ScrollReactiveCard
                 accentKey="introduction-solution"
-                variant="slide"
+                effectVariant="slide"
                 sx={{
                   borderRadius: 3,
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -945,7 +945,7 @@ export default function Page() {
             <Grid size={{ xs: 12, md: 6 }}>
               <ScrollReactiveCard
                 accentKey="introduction-impact"
-                variant="tilt"
+                effectVariant="tilt"
                 sx={{
                   borderRadius: 3,
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -1006,7 +1006,7 @@ export default function Page() {
               <Grid size={{ xs: 12, md: 6 }} key={m.name}>
                 <ScrollReactiveCard
                   accentKey={`team-${m.name}`}
-                  variant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
+                  effectVariant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                   sx={{
                     borderRadius: 3,
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -1081,7 +1081,7 @@ export default function Page() {
 
           <ScrollReactiveCard
             accentKey="design-criteria"
-            variant="slide"
+            effectVariant="slide"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -1141,7 +1141,7 @@ export default function Page() {
 
           <ScrollReactiveCard
             accentKey="design-functionality"
-            variant="tilt"
+            effectVariant="tilt"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
@@ -1215,7 +1215,7 @@ export default function Page() {
               <Grid key={item.title} size={{ xs: 12, md: 6, lg: 4 }}>
                 <ScrollReactiveCard
                   accentKey={`system-architecture-${item.title}`}
-                  variant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
+                  effectVariant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                   sx={{
                     borderRadius: 3,
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -1286,7 +1286,7 @@ export default function Page() {
               <Grid size={{ xs: 12, md: 4 }} key={model.title}>
                 <ScrollReactiveCard
                   accentKey={`model-gallery-${model.title}`}
-                  variant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
+                  effectVariant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                   sx={{
                     borderRadius: 3,
                     border: "1px solid rgba(255,255,255,0.12)",
@@ -1342,7 +1342,7 @@ export default function Page() {
           </Typography>
           <ScrollReactiveCard
             accentKey="results-demo"
-            variant="ripple"
+            effectVariant="ripple"
             sx={{
               borderRadius: 3,
               border: "1px solid rgba(255,255,255,0.08)",
