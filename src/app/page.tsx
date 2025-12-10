@@ -21,11 +21,19 @@ import {
   TableRow,
   Toolbar,
   Typography,
+  Grid,
 } from "@mui/material";
-import Grid from "@mui/material/Grid"; // IMPORTANT: Classic Grid import
 import MenuIcon from "@mui/icons-material/Menu";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+import type { ObjViewerProps } from "./components/ObjViewer";
+
+const ObjViewer = dynamic<ObjViewerProps>(
+  () => import("./components/ObjViewer"),
+  { ssr: false }
+);
+
 
 // ==================== THEME ====================
 const theme = createTheme({
@@ -77,6 +85,24 @@ const galleryItems = [
   { src: "/ros.JPG", title: "ROS graph overview" },
 ];
 
+const modelGallery = [
+  {
+    title: "Camera Mount",
+    description:
+      "Custom Intel Realsense mount for Omron robotic arm.",
+    src: "/models/mount.obj",
+    mtlSrc: "/models/mount.mtl",
+  },
+
+  {
+    title: "Color Cube",
+    description:
+      "Material-coded reference cube demonstrating MTL-driven shading in the viewer.",
+    src: "/models/cube.obj",
+    mtlSrc: "/models/cube.mtl",
+  },
+];
+
 const rosCodeSnippet = String.raw`# Example ROS 2 pipeline for GroceryGizmo
 
 # Camera node publishes RGB(+depth)
@@ -122,13 +148,30 @@ export default function Page() {
           </Typography>
 
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
-            <Button color="inherit" onClick={() => scrollTo("team")}>Team</Button>
-            <Button color="inherit" onClick={() => scrollTo("abstract")}>Abstract</Button>
-            <Button color="inherit" onClick={() => scrollTo("project")}>Project</Button>
-            <Button color="inherit" onClick={() => scrollTo("tasks")}>Tasks</Button>
-            <Button color="inherit" onClick={() => scrollTo("bom")}>BOM</Button>
-            <Button color="inherit" onClick={() => scrollTo("gallery")}>Gallery</Button>
-            <Button color="inherit" onClick={() => scrollTo("code")}>Code</Button>
+            <Button color="inherit" onClick={() => scrollTo("team")}>
+              Team
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("abstract")}>
+              Abstract
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("project")}>
+              Project
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("viewer")}>
+              3D Models
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("tasks")}>
+              Tasks
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("bom")}>
+              BOM
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("gallery")}>
+              Gallery
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("code")}>
+              Code
+            </Button>
           </Box>
 
           <IconButton sx={{ display: { xs: "flex", md: "none" } }}>
@@ -177,10 +220,18 @@ export default function Page() {
               </Typography>
 
               <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                <Button variant="contained" size="large" onClick={() => scrollTo("project")}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => scrollTo("project")}
+                >
                   View Project Details
                 </Button>
-                <Button variant="outlined" size="large" onClick={() => scrollTo("gallery")}>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={() => scrollTo("gallery")}
+                >
                   View Gallery
                 </Button>
               </Box>
@@ -237,7 +288,12 @@ export default function Page() {
           <Grid container spacing={3}>
             {teamMembers.map((m) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={m.name}>
-                <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
                   <CardContent>
                     <Typography variant="h6" sx={{ fontWeight: 600, mb: 1.5 }}>
                       {m.name}
@@ -265,7 +321,12 @@ export default function Page() {
             Abstract
           </Typography>
 
-          <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
             <CardContent>
               <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
                 We will use an industrial six-axis robot arm acquired through
@@ -273,13 +334,13 @@ export default function Page() {
                 refrigerator. The system includes a mobile base, vision-based
                 item identification via AR tags, and a gripper capable of
                 handling cartons, cans, and loose produce. After mapping the
-                kitchen, the robot detects tagged groceries, plans collision-free
-                trajectories, and places each item on a matching AR-tagged shelf
-                inside the fridge. Safety is ensured through soft limits,
-                supervised operation, and an emergency stop. The prototype
-                demonstrates practical home automation and provides a platform
-                for experimenting with perception, grasp planning, and task
-                sequencing in cluttered environments—supporting elderly,
+                kitchen, the robot detects tagged groceries, plans
+                collision-free trajectories, and places each item on a matching
+                AR-tagged shelf inside the fridge. Safety is ensured through
+                soft limits, supervised operation, and an emergency stop. The
+                prototype demonstrates practical home automation and provides a
+                platform for experimenting with perception, grasp planning, and
+                task sequencing in cluttered environments—supporting elderly,
                 disabled, or recovering individuals with day-to-day tasks.
               </Typography>
             </CardContent>
@@ -290,7 +351,7 @@ export default function Page() {
       <Divider />
 
       {/* =========================================== */}
-      {/* PROJECT DESCRIPTION (Goals, Architecture, etc.) */}
+      {/* PROJECT DESCRIPTION */}
       {/* =========================================== */}
 
       <Box id="project" sx={{ py: 8 }}>
@@ -299,11 +360,15 @@ export default function Page() {
             Project Description
           </Typography>
 
-          {/* GOALS + ARCHITECTURE */}
           <Grid container spacing={4}>
             {/* Goals */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
                   <Typography variant="h6" sx={{ mb: 1.5 }}>
                     Project Goals
@@ -331,7 +396,12 @@ export default function Page() {
 
             {/* Architecture */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
                   <Typography variant="h6" sx={{ mb: 1.5 }}>
                     Software & Hardware Architecture
@@ -348,12 +418,18 @@ export default function Page() {
             </Grid>
           </Grid>
 
-          {/* Sensing / Planning / Actuation */}
           <Grid container spacing={4} sx={{ mt: 4 }}>
             <Grid size={{ xs: 12, md: 4 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1 }}>Sensing</Typography>
+                  <Typography variant="h6" sx={{ mb: 1 }}>
+                    Sensing
+                  </Typography>
                   <Typography sx={{ color: "grey.200" }}>
                     RGB-D camera detects AR tags on groceries & fridge shelves;
                     gripper force sensor ensures safe grasps.
@@ -363,9 +439,16 @@ export default function Page() {
             </Grid>
 
             <Grid size={{ xs: 12, md: 4 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1 }}>Planning</Typography>
+                  <Typography variant="h6" sx={{ mb: 1 }}>
+                    Planning
+                  </Typography>
                   <Typography sx={{ color: "grey.200" }}>
                     MoveIt + IK compute collision-free pick-and-place
                     trajectories around obstacles like fridge doors.
@@ -375,9 +458,16 @@ export default function Page() {
             </Grid>
 
             <Grid size={{ xs: 12, md: 4 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1 }}>Actuation</Typography>
+                  <Typography variant="h6" sx={{ mb: 1 }}>
+                    Actuation
+                  </Typography>
                   <Typography sx={{ color: "grey.200" }}>
                     Omron TM5-700 arm and Robotiq gripper manipulate groceries
                     safely using category-based grip forces.
@@ -385,6 +475,63 @@ export default function Page() {
                 </CardContent>
               </Card>
             </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      <Divider />
+
+      {/* =========================================== */}
+      {/* 3D MODELS GALLERY */}
+      {/* =========================================== */}
+
+      <Box id="viewer" sx={{ py: 8 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+            3D Models Gallery
+          </Typography>
+          <Typography sx={{ color: "grey.400", mb: 4 }}>
+            Browse the simplified CAD assets we use for workspace layout,
+            storage design, and reach studies inside the planning pipeline.
+          </Typography>
+
+          <Grid container spacing={4}>
+            {modelGallery.map((model) => (
+              <Grid size={{ xs: 12, md: 4 }} key={model.title}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                      background: "rgba(255,255,255,0.02)",
+                    }}
+                  >
+                    <ObjViewer
+                      src={model.src}
+                      mtlSrc={model.mtlSrc}
+                      height={240}
+                    />
+                  </Box>
+
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      {model.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "grey.400" }}>
+                      {model.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
         </Container>
       </Box>
@@ -404,9 +551,16 @@ export default function Page() {
           <Grid container spacing={4}>
             {/* Build */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1.5 }}>Build</Typography>
+                  <Typography variant="h6" sx={{ mb: 1.5 }}>
+                    Build
+                  </Typography>
                   <Typography component="ul" sx={{ pl: 2 }}>
                     <li>Manufacture AR tag stickers</li>
                     <li>Apply tags to groceries and fridge shelf locations</li>
@@ -417,9 +571,16 @@ export default function Page() {
 
             {/* Code */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1.5 }}>Code</Typography>
+                  <Typography variant="h6" sx={{ mb: 1.5 }}>
+                    Code
+                  </Typography>
                   <Typography component="ul" sx={{ pl: 2 }}>
                     <li>Camera Node → /camera/image_raw</li>
                     <li>AR Node → /aruco/poses, /tf</li>
@@ -431,12 +592,18 @@ export default function Page() {
             </Grid>
           </Grid>
 
-          {/* Test */}
           <Grid container spacing={4} sx={{ mt: 4 }}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1.5 }}>Test</Typography>
+                  <Typography variant="h6" sx={{ mb: 1.5 }}>
+                    Test
+                  </Typography>
                   <Typography component="ul" sx={{ pl: 2 }}>
                     <li>Begin with fridge open and item on counter</li>
                     <li>Perform pick + move sequence</li>
@@ -465,7 +632,13 @@ export default function Page() {
           <Typography sx={{ color: "grey.400", mb: 3 }}>N/A</Typography>
 
           <Typography variant="h6">5.2 Other Robotic Platforms</Typography>
-          <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)", mb: 3 }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              border: "1px solid rgba(255,255,255,0.08)",
+              mb: 3,
+            }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -485,7 +658,12 @@ export default function Page() {
           </Card>
 
           <Typography variant="h6">5.3 Other Purchases</Typography>
-          <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.08)" }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -528,7 +706,7 @@ export default function Page() {
             Robot Gallery
           </Typography>
           <Typography sx={{ color: "grey.400", mb: 3 }}>
-            Replace images in <code>/public/images/</code> with your own.
+            Photos from the GroceryGizmo deployment and development pipeline.
           </Typography>
 
           <ImageList variant="masonry" cols={3} gap={12}>
@@ -575,7 +753,12 @@ export default function Page() {
             Example pipeline showing vision → pose estimation → IK planning.
           </Typography>
 
-          <Card sx={{ borderRadius: 3, border: "1px solid rgba(255,255,255,0.12)" }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              border: "1px solid rgba(255,255,255,0.12)",
+            }}
+          >
             <CardContent>
               <Box
                 component="pre"
@@ -600,7 +783,10 @@ export default function Page() {
       {/* FOOTER */}
       <Box sx={{ py: 4 }}>
         <Container maxWidth="lg">
-          <Typography variant="body2" sx={{ color: "grey.500", textAlign: "center" }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "grey.500", textAlign: "center" }}
+          >
             GroceryGizmo • EECS 106A •{" "}
             <MuiLink
               href="https://eecs.berkeley.edu"
