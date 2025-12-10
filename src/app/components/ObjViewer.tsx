@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls, Bounds, Center } from "@react-three/drei";
+import { OrbitControls, Bounds, Center, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
@@ -225,6 +225,56 @@ function AutoRotator({
   return <group ref={groupRef}>{children}</group>;
 }
 
+function LoadingIndicator({ accent }: { accent?: string }) {
+  const baseColor = React.useMemo(() => new THREE.Color(accent ?? "#7fffd4"), [accent]);
+  const ringColor = `#${baseColor.clone().lerp(new THREE.Color("#ffffff"), 0.5).getHexString()}33`;
+  const glowColor = `#${baseColor.clone().lerp(new THREE.Color("#0a0c1c"), 0.2).getHexString()}55`;
+  const primaryHex = `#${baseColor.getHexString()}`;
+
+  return (
+    <Html center>
+      <div style={{ position: "relative", width: 48, height: 48 }}>
+        <style>{`
+          @keyframes objViewerSpin { to { transform: rotate(360deg); } }
+          @keyframes objViewerPulse { 0%, 100% { transform: scale(0.6); opacity: 0.35; } 50% { transform: scale(1); opacity: 0.8; } }
+        `}</style>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${glowColor} 0%, transparent 65%)`,
+            filter: "blur(6px)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            border: `3px solid ${ringColor}`,
+            borderTopColor: primaryHex,
+            animation: "objViewerSpin 1.2s linear infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            backgroundColor: primaryHex,
+            transform: "translate(-50%, -50%)",
+            animation: "objViewerPulse 1.6s ease-in-out infinite",
+          }}
+        />
+      </div>
+    </Html>
+  );
+}
+
 // --------------------------------------------------------
 // OBJ Viewer Component
 // --------------------------------------------------------
@@ -271,7 +321,7 @@ export default function ObjViewer({
         <directionalLight position={[-6, 4, -6]} intensity={0.6} />
 
         {/* Load the OBJ */}
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingIndicator accent={fallbackColor} />}>
           <Bounds fit clip observe margin={1.2}>
             {autoRotateAxis ? (
               <AutoRotator axis={autoRotateAxis} speed={autoRotateSpeed}>

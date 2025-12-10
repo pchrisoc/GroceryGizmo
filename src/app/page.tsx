@@ -365,7 +365,7 @@ const teamMembers: Array<{
     name: "Arya Sasikumar",
     background:
       "Mechanical Engineering & Business major interested in robotics. Well-versed in Solidworks, ROS, Python, and C++.",
-    avatar: "/arya.jpeg",
+    avatar: "/arya.png",
   },
   {
     name: "Gursimar Virk",
