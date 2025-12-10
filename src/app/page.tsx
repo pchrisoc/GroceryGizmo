@@ -383,7 +383,7 @@ const teamMembers: Array<{
     name: "Divya Krishnaswamy",
     background:
       "Bioengineering major & EECS minor interested in surgical robotics. Experience with Solidworks, C++, Python, and embedded systems.",
-    avatar: "/divya.jpeg",
+    avatar: "/divya.jpg",
   },
   {
     name: "Patrick O’Connor",
