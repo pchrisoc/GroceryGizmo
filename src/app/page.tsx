@@ -1,5 +1,6 @@
 "use client";
 
+import type { SxProps, Theme } from "@mui/material/styles";
 import React from "react";
 import {
   AppBar,
@@ -37,6 +38,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -114,6 +116,36 @@ const NAV_SECTIONS = [
   { id: "results", label: "Results" },
   { id: "conclusion", label: "Conclusion" },
 ] as const;
+
+const mobileTeamOverlaySxCache = new Map<string, SxProps<Theme>>();
+
+function getMobileOverlayStyles(accent: string): SxProps<Theme> {
+  if (mobileTeamOverlaySxCache.has(accent)) {
+    return mobileTeamOverlaySxCache.get(accent)!;
+  }
+
+  const styles: SxProps<Theme> = {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 2,
+    p: 3,
+    background: `linear-gradient(180deg, ${hexToRgba(accent, 0.85)} 0%, rgba(5,7,17,0.96) 100%)`,
+    border: `1px solid ${hexToRgba(accent, 0.45)}`,
+    boxShadow: `0 22px 48px ${hexToRgba(accent, 0.25)}`,
+    color: "#e9fef7",
+    transition: "opacity 0.35s ease, transform 0.4s ease",
+    transform: "translateY(16px)",
+    opacity: 0,
+    pointerEvents: "none",
+    zIndex: 4,
+  };
+
+  mobileTeamOverlaySxCache.set(accent, styles);
+  return styles;
+}
 
 type ReactiveVariant = (typeof REACTIVE_VARIANTS)[number];
 
@@ -809,6 +841,7 @@ export default function Page() {
   >(null);
   const [selectedCodeFile, setSelectedCodeFile] = React.useState(codeSamples[0].value);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
+  const [expandedMember, setExpandedMember] = React.useState<string | null>(null);
 
   const selectedSample = React.useMemo(
     () => codeSamples.find((sample) => sample.value === selectedCodeFile) ?? codeSamples[0],
@@ -853,6 +886,10 @@ export default function Page() {
     setMobileNavOpen(false);
     scrollTo(id);
   };
+
+  const toggleMemberDescription = React.useCallback((name: string) => {
+    setExpandedMember((prev) => (prev === name ? null : name));
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -1227,69 +1264,200 @@ export default function Page() {
           </Typography>
 
           <Grid container spacing={3}>
-            {teamMembers.map((m, index) => (
-              <Grid size={{ xs: 12, md: 6 }} key={m.name}>
-                <ScrollReactiveCard
-                  accentKey={`team-${m.name}`}
-                  effectVariant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
-                  sx={{
-                    borderRadius: 3,
-                    border: "1px solid rgba(255,255,255,0.08)",
-                  }}
-                >
-                  <CardContent
+            {teamMembers.map((m, index) => {
+              const isExpanded = expandedMember === m.name;
+              const accentColor = accentFromKey(`team-${m.name}`);
+              const accentGlow = hexToRgba(accentColor, 0.25);
+              const mobileOverlayBase = getMobileOverlayStyles(accentColor);
+
+              return (
+                <Grid size={{ xs: 12, md: 6 }} key={m.name}>
+                  <ScrollReactiveCard
+                    accentKey={`team-${m.name}`}
+                    effectVariant={REACTIVE_VARIANTS[index % REACTIVE_VARIANTS.length]}
                     sx={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      p: 0,
-                      height: 200,
+                      borderRadius: 3,
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      overflow: "hidden",
                     }}
                   >
-                    <Avatar
-                      variant="square"
-                      alt={m.name}
-                      src={m.avatar}
-                      sx={{
-                        width: 200,
-                        height: 200,
-                        flexShrink: 0,
-                        borderRadius: 0,
-                        bgcolor: m.avatar ? "transparent" : stringToAvatarColor(m.name),
-                        color: m.avatar ? undefined : "rgba(9,11,19,0.92)",
-                        fontSize: 18,
-                        fontWeight: 600,
-                        "& img": {
-                          objectFit: "cover",
-                        },
-                      }}
-                    >
-                      {initialsFromName(m.name)}
-                    </Avatar>
+                    <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+                      <Box
+                        sx={{
+                          display: { xs: "none", md: "flex" },
+                          alignItems: "stretch",
+                        }}
+                      >
+                        <Avatar
+                          variant="square"
+                          alt={m.name}
+                          src={m.avatar}
+                          sx={{
+                            width: 200,
+                            height: 200,
+                            flexShrink: 0,
+                            borderRadius: 0,
+                            bgcolor: m.avatar ? "transparent" : stringToAvatarColor(m.name),
+                            color: m.avatar ? undefined : "rgba(9,11,19,0.92)",
+                            fontSize: 18,
+                            fontWeight: 600,
+                            "& img": {
+                              objectFit: "cover",
+                            },
+                          }}
+                        >
+                          {initialsFromName(m.name)}
+                        </Avatar>
 
-                    <Box
-                      sx={{
-                        flex: 1,
-                        p: 3,
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {m.name}
-                      </Typography>
-                      <Typography variant="subtitle2" sx={{ fontStyle: "italic", color: "grey.300" }}>
-                        {m.role}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "grey.400" }}>
-                        {m.background}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </ScrollReactiveCard>
-              </Grid>
-            ))}
+                        <Box
+                          sx={{
+                            flex: 1,
+                            p: 3,
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            gap: 1,
+                          }}
+                        >
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {m.name}
+                          </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontStyle: "italic", color: "grey.300" }}
+                          >
+                            {m.role}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: "grey.400", lineHeight: 1.6 }}>
+                            {m.background}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: { xs: "block", md: "none" },
+                          position: "relative",
+                        }}
+                      >
+                        <Avatar
+                          variant="square"
+                          alt={m.name}
+                          src={m.avatar}
+                          sx={{
+                            width: "100%",
+                            height: 280,
+                            borderRadius: 0,
+                            bgcolor: m.avatar ? "transparent" : stringToAvatarColor(m.name),
+                            color: m.avatar ? undefined : "rgba(9,11,19,0.92)",
+                            fontSize: 22,
+                            fontWeight: 600,
+                            "& img": {
+                              objectFit: "cover",
+                              objectPosition: "center",
+                            },
+                          }}
+                        >
+                          {initialsFromName(m.name)}
+                        </Avatar>
+
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            inset: 0,
+                            pointerEvents: "none",
+                            background: `linear-gradient(180deg, transparent 45%, rgba(5,7,17,0.88) 100%)`,
+                            zIndex: 1,
+                          }}
+                        />
+
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            p: 2.5,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 0.5,
+                            zIndex: 2,
+                          }}
+                        >
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {m.name}
+                          </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontStyle: "italic", color: "rgba(255,255,255,0.78)" }}
+                          >
+                            {m.role}
+                          </Typography>
+                        </Box>
+
+                        <IconButton
+                          aria-label={isExpanded ? `Hide ${m.name} bio` : `Show ${m.name} bio`}
+                          onClick={() => toggleMemberDescription(m.name)}
+                          sx={{
+                            position: "absolute",
+                            top: 14,
+                            right: 14,
+                            color: accentColor,
+                            backgroundColor: "rgba(9,11,25,0.7)",
+                            border: `1px solid ${hexToRgba(accentColor, 0.4)}`,
+                            boxShadow: isExpanded
+                              ? `0 12px 28px ${accentGlow}`
+                              : `0 6px 18px rgba(5,7,17,0.45)`,
+                            transition: "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
+                            transform: isExpanded ? "rotate(45deg)" : "rotate(0deg)",
+                            "&:hover": {
+                              backgroundColor: "rgba(9,11,25,0.86)",
+                            },
+                            zIndex: 3,
+                          }}
+                        >
+                          <AddIcon />
+                        </IconButton>
+
+                        <Box
+                          role="dialog"
+                          aria-modal={isExpanded}
+                          aria-hidden={!isExpanded}
+                          onClick={() => toggleMemberDescription(m.name)}
+                          sx={isExpanded
+                            ? {
+                                ...mobileOverlayBase,
+                                opacity: 1,
+                                pointerEvents: "auto",
+                                transform: "translateY(0)",
+                                boxShadow: `0 22px 48px ${accentGlow}`,
+                              }
+                            : mobileOverlayBase
+                          }
+                        >
+                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                            {m.name}
+                          </Typography>
+                          <Typography variant="body2" sx={{ lineHeight: 1.7 }}>
+                            {m.background}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              textTransform: "uppercase",
+                              letterSpacing: 1,
+                              color: "rgba(255,255,255,0.72)",
+                            }}
+                          >
+                            Tap anywhere to close
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </ScrollReactiveCard>
+                </Grid>
+              );
+            })}
           </Grid>
         </Container>
       </Box>

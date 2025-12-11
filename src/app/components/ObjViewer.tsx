@@ -257,19 +257,6 @@ function LoadingIndicator({ accent }: { accent?: string }) {
             animation: "objViewerSpin 1.2s linear infinite",
           }}
         />
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            backgroundColor: primaryHex,
-            transform: "translate(-50%, -50%)",
-            animation: "objViewerPulse 1.6s ease-in-out infinite",
-          }}
-        />
       </div>
     </Html>
   );
