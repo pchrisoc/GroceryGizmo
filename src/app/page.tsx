@@ -782,7 +782,7 @@ const resultMedia = [
 ];
 
 const demoVideoUrl =
-  "https://drive.google.com/file/d/1nBBwt9rWLdB6iRijCdiFLPdSFuZzn3BH/view?usp=sharing";
+  "https://drive.google.com/file/d/1sSn59fT9UaXw09uU73KojV-ZqYzFssF2/view?usp=sharing";
 
 const additionalMaterials = [
   {
