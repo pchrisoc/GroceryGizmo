@@ -11,12 +11,17 @@ import {
   CardContent,
   Container,
   CssBaseline,
+  Drawer,
   Dialog,
   DialogContent,
   Divider,
   IconButton,
   ImageList,
   ImageListItem,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Link as MuiLink,
   Table,
   TableBody,
@@ -97,6 +102,17 @@ const REACTIVE_VARIANTS = [
   "ripple",
   "swing",
   "prism",
+] as const;
+
+const NAV_SECTIONS = [
+  { id: "introduction", label: "Introduction" },
+  { id: "team", label: "Team" },
+  { id: "design", label: "Design" },
+  { id: "implementation", label: "Implementation" },
+  { id: "code", label: "Code" },
+  { id: "viewer", label: "3D Models" },
+  { id: "results", label: "Results" },
+  { id: "conclusion", label: "Conclusion" },
 ] as const;
 
 type ReactiveVariant = (typeof REACTIVE_VARIANTS)[number];
@@ -792,6 +808,7 @@ export default function Page() {
     (typeof systemArchitectureImages)[number] | null
   >(null);
   const [selectedCodeFile, setSelectedCodeFile] = React.useState(codeSamples[0].value);
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
 
   const selectedSample = React.useMemo(
     () => codeSamples.find((sample) => sample.value === selectedCodeFile) ?? codeSamples[0],
@@ -827,9 +844,14 @@ export default function Page() {
     [collapsed]
   );
 
-  const scrollTo = (id: string) => {
+  const scrollTo = React.useCallback((id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  const handleMobileNavSelect = (id: string) => {
+    setMobileNavOpen(false);
+    scrollTo(id);
   };
 
   return (
@@ -876,30 +898,16 @@ export default function Page() {
               transition: "gap 0.3s ease",
             }}
           >
-            <Button color="inherit" onClick={() => scrollTo("introduction")} sx={navButtonSx}>
-              Introduction
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("team")} sx={navButtonSx}>
-              Team
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("design")} sx={navButtonSx}>
-              Design
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("implementation")} sx={navButtonSx}>
-              Implementation
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("code")} sx={navButtonSx}>
-              Code
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("viewer")} sx={navButtonSx}>
-              3D Models
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("results")} sx={navButtonSx}>
-              Results
-            </Button>
-            <Button color="inherit" onClick={() => scrollTo("conclusion")} sx={navButtonSx}>
-              Conclusion
-            </Button>
+            {NAV_SECTIONS.map((section) => (
+              <Button
+                key={section.id}
+                color="inherit"
+                onClick={() => scrollTo(section.id)}
+                sx={navButtonSx}
+              >
+                {section.label}
+              </Button>
+            ))}
           </Box>
 
           <IconButton
@@ -910,11 +918,77 @@ export default function Page() {
               borderRadius: 2,
               p: collapsed ? 0.5 : 1,
             }}
+            aria-label="Open navigation"
+            onClick={() => setMobileNavOpen(true)}
           >
             <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      <Drawer
+        anchor="right"
+        open={mobileNavOpen}
+        onClose={() => setMobileNavOpen(false)}
+        ModalProps={{ keepMounted: true }}
+        PaperProps={{
+          sx: {
+            width: "80vw",
+            maxWidth: 320,
+            background: "rgba(9,11,25,0.96)",
+            color: "grey.100",
+            backdropFilter: "blur(16px)",
+            borderLeft: "1px solid rgba(255,255,255,0.08)",
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 2.5,
+            py: 2,
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            Navigate
+          </Typography>
+          <IconButton
+            aria-label="Close navigation"
+            onClick={() => setMobileNavOpen(false)}
+            sx={{ color: "grey.300" }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+        <List sx={{ p: 0 }}>
+          {NAV_SECTIONS.map((section) => (
+            <ListItem key={section.id} disablePadding>
+              <ListItemButton
+                onClick={() => handleMobileNavSelect(section.id)}
+                sx={{
+                  px: 2.5,
+                  py: 1.5,
+                  color: "grey.100",
+                  "&:hover": {
+                    backgroundColor: "rgba(127,255,212,0.08)",
+                    color: "#7fffd4",
+                  },
+                }}
+              >
+                <ListItemText
+                  primary={section.label}
+                  primaryTypographyProps={{
+                    sx: { fontWeight: 500, letterSpacing: 0.2 },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
 
       {/* =========================================== */}
       {/* HERO SECTION */}
