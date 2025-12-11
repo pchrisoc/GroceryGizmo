@@ -781,7 +781,8 @@ const resultMedia = [
   { src: "/ros.JPG", title: "ROS graph overview" },
 ];
 
-const demoVideoUrl = "https://drive.google.com/file/d/1GroceryGizmoDemo/view?usp=sharing";
+const demoVideoUrl =
+  "https://drive.google.com/file/d/1nBBwt9rWLdB6iRijCdiFLPdSFuZzn3BH/view?usp=sharing";
 
 const additionalMaterials = [
   {
@@ -1875,21 +1876,22 @@ export default function Page() {
             }}
           >
             <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                Demo Video
-              </Typography>
-              <Typography sx={{ color: "grey.300" }}>
-                Watch the full pick-and-place routine, including detection overlays and fridge placement, in our recorded demo.
-              </Typography>
-              <MuiLink
-                href={demoVideoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                underline="hover"
-                color="primary.main"
-              >
-                GroceryGizmo Demo Video
-              </MuiLink>
+              <Box
+                component="iframe"
+                src="https://drive.google.com/file/d/1nBBwt9rWLdB6iRijCdiFLPdSFuZzn3BH/preview"
+                title="GroceryGizmo Demo Video"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+                sx={{
+                  width: "100%",
+                  aspectRatio: "16 / 9",
+                  borderRadius: 2,
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backgroundColor: "rgba(255,255,255,0.02)",
+                  mt: 2,
+                  boxShadow: "0 18px 36px rgba(0,0,0,0.35)",
+                }}
+              />
             </CardContent>
           </ScrollReactiveCard>
         </Container>
