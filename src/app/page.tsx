@@ -26,6 +26,9 @@ import {
   Toolbar,
   Typography,
   Grid,
+  FormControl,
+  InputLabel,
+  MenuItem,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -33,6 +36,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import type { ObjViewerProps } from "./components/ObjViewer";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 const ObjViewer = dynamic<ObjViewerProps>(
   () => import("./components/ObjViewer"),
@@ -124,6 +128,51 @@ function hexToRgba(hex: string, alpha: number): string {
   const b = bigint & 255;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+const CODE_THEME_MAP: Record<
+  string,
+  {
+    background: string;
+    border: string;
+    glow: string;
+    text: string;
+    badge: string;
+    badgeText: string;
+  }
+> = {
+  python: {
+    background: "linear-gradient(160deg, rgba(12,38,33,0.92), rgba(6,18,20,0.96))",
+    border: "rgba(127,255,212,0.45)",
+    glow: "0 22px 48px rgba(127,255,212,0.18)",
+    text: "#e9fff7",
+    badge: "rgba(127,255,212,0.14)",
+    badgeText: "#7fffd4",
+  },
+  typescript: {
+    background: "linear-gradient(160deg, rgba(16,32,58,0.92), rgba(9,15,32,0.96))",
+    border: "rgba(122,184,255,0.55)",
+    glow: "0 22px 52px rgba(122,184,255,0.2)",
+    text: "#f2f6ff",
+    badge: "rgba(122,184,255,0.18)",
+    badgeText: "#7ab8ff",
+  },
+  bash: {
+    background: "linear-gradient(160deg, rgba(18,39,24,0.92), rgba(8,18,14,0.96))",
+    border: "rgba(125,255,181,0.45)",
+    glow: "0 22px 48px rgba(125,255,181,0.18)",
+    text: "#e8ffef",
+    badge: "rgba(125,255,181,0.16)",
+    badgeText: "#7dffb5",
+  },
+  default: {
+    background: "linear-gradient(160deg, rgba(24,27,44,0.92), rgba(8,10,19,0.96))",
+    border: "rgba(160,174,192,0.4)",
+    glow: "0 18px 42px rgba(17,20,38,0.35)",
+    text: "#f5f6fb",
+    badge: "rgba(160,174,192,0.18)",
+    badgeText: "#d5daef",
+  },
+};
 
 type ScrollReactiveCardProps = React.ComponentProps<typeof Card> & {
   accentKey: string;
@@ -389,7 +438,7 @@ const teamMembers: Array<{
     role: "Testing & Integration",
     background:
       "Bioengineering major & EECS minor interested in surgical robotics. Experience with Solidworks, C++, Python, and embedded systems.",
-    avatar: "/divya.jpeg",
+    avatar: "/divya.jpg",
   },
   {
     name: "Patrick O’Connor",
@@ -397,6 +446,83 @@ const teamMembers: Array<{
     background:
       "Third-year EECS major with interest in EE & robotics. Experience with Fusion, KiCad, and Python.",
     avatar: "/patrick.jpg",
+  },
+];
+
+const codeSamples = [
+  {
+    value: "ros-launch",
+    label: "ros_launch.py",
+    language: "python",
+    description:
+      "Launches the RealSense camera and ArUco detector nodes that feed GroceryGizmo's perception stack.",
+    code: String.raw`import launch
+from launch_ros.actions import Node
+
+
+def generate_launch_description():
+    return launch.LaunchDescription([
+        Node(
+            package="realsense2_camera",
+            executable="realsense2_camera_node",
+            name="camera",
+            parameters=[{"rgb_module.profile": "640x480x30"}],
+        ),
+        Node(
+            package="aruco_detector",
+            executable="detector",
+            output="screen",
+            parameters=[{"publish_tf": True}],
+        ),
+    ])
+
+
+if __name__ == "__main__":
+    launch.LaunchService(argv=[]).run(generate_launch_description())`,
+  },
+  {
+    value: "api-handler",
+    label: "route-handler.ts",
+    language: "typescript",
+    description:
+      "Next.js API route that revalidates cached dashboards after a new manipulation log is uploaded.",
+    code: String.raw`import type { NextRequest } from "next/server";
+import { revalidateTag } from "next/cache";
+
+
+export async function POST(request: NextRequest) {
+    const payload = await request.json();
+    if (!payload?.tag) {
+        return new Response("Missing tag", { status: 400 });
+    }
+
+    await revalidateTag(payload.tag);
+    return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+    });
+}
+
+export const dynamic = "force-dynamic";`,
+  },
+  {
+    value: "deploy-script",
+    label: "deploy.sh",
+    language: "bash",
+    description:
+      "One-command deploy script that builds the site and syncs static assets to the robot operator console.",
+    code: String.raw`#!/usr/bin/env bash
+set -euo pipefail
+
+pnpm install --frozen-lockfile
+pnpm run build
+
+rsync -avz --delete \
+    ./.next \
+    public \
+    package.json \
+    user@robot:/opt/grocerygizmo/site/
+
+echo "Deployment finished ✅"`,
   },
 ];
 
@@ -665,6 +791,21 @@ export default function Page() {
   const [preview, setPreview] = React.useState<
     (typeof systemArchitectureImages)[number] | null
   >(null);
+  const [selectedCodeFile, setSelectedCodeFile] = React.useState(codeSamples[0].value);
+
+  const selectedSample = React.useMemo(
+    () => codeSamples.find((sample) => sample.value === selectedCodeFile) ?? codeSamples[0],
+    [selectedCodeFile]
+  );
+
+  const codeTheme = React.useMemo(
+    () => CODE_THEME_MAP[selectedSample.language] ?? CODE_THEME_MAP.default,
+    [selectedSample.language]
+  );
+
+  const handleCodeChange = (event: SelectChangeEvent<string>) => {
+    setSelectedCodeFile(event.target.value as string);
+  };
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -746,6 +887,9 @@ export default function Page() {
             </Button>
             <Button color="inherit" onClick={() => scrollTo("implementation")} sx={navButtonSx}>
               Implementation
+            </Button>
+            <Button color="inherit" onClick={() => scrollTo("code")} sx={navButtonSx}>
+              Code
             </Button>
             <Button color="inherit" onClick={() => scrollTo("viewer")} sx={navButtonSx}>
               3D Models
@@ -1276,6 +1420,136 @@ export default function Page() {
       </Box>
 
       <Divider />
+
+          {/* =========================================== */}
+          {/* CODE SECTION */}
+          {/* =========================================== */}
+
+          <Box id="code" sx={{ py: 8 }}>
+            <Container maxWidth="lg">
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+                Code
+              </Typography>
+              <Typography sx={{ color: "grey.400", mb: 4 }}>
+                Peek at the snippets that launch perception, revalidate dashboards, and deploy GroceryGizmo with a single command.
+              </Typography>
+
+              <Grid container spacing={4} alignItems="stretch">
+                <Grid size={{ xs: 12, md: 5 }}>
+                  <ScrollReactiveCard
+                    accentKey="code-controls"
+                    effectVariant="slide"
+                    sx={{
+                      borderRadius: 3,
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      height: "100%",
+                    }}
+                  >
+                    <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      <Box>
+                        <Typography variant="subtitle2" sx={{ color: "grey.200", textTransform: "uppercase", letterSpacing: 1.5 }}>
+                          Code Library
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 600, mt: 1 }}>
+                          Select a file to explore
+                        </Typography>
+                        <Typography sx={{ color: "grey.300", mt: 1.5, lineHeight: 1.7 }}>
+                          Three representative files trace the end-to-end pipeline: ROS launch, web API revalidation, and the deployment helper script.
+                        </Typography>
+                      </Box>
+
+                      <FormControl fullWidth variant="outlined" sx={{ "& .MuiInputLabel-root": { color: "grey.400" }, "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.12)" } }}>
+                        <InputLabel id="code-sample-label">Code sample</InputLabel>
+                        <Select
+                          labelId="code-sample-label"
+                          id="code-sample"
+                          value={selectedCodeFile}
+                          label="Code sample"
+                          onChange={handleCodeChange}
+                          sx={{ color: "grey.100" }}
+                        >
+                          {codeSamples.map((sample) => (
+                            <MenuItem key={sample.value} value={sample.value}>
+                              {sample.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        <Typography variant="subtitle2" sx={{ color: "grey.200", fontWeight: 600 }}>
+                          What you&apos;re viewing
+                        </Typography>
+                        <Typography sx={{ color: "grey.400", lineHeight: 1.6 }}>
+                          {selectedSample.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </ScrollReactiveCard>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 7 }}>
+                  <ScrollReactiveCard
+                    accentKey={`code-${selectedSample.language}`}
+                    accentColor={codeTheme.badgeText}
+                    effectVariant="prism"
+                    sx={{
+                      height: "100%",
+                      borderRadius: 3,
+                      border: `1px solid ${codeTheme.border}`,
+                      boxShadow: codeTheme.glow,
+                      background: codeTheme.background,
+                      color: codeTheme.text,
+                    }}
+                  >
+                    <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3, height: "100%" }}>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 1.5 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {selectedSample.label}
+                        </Typography>
+                        <Box
+                          sx={{
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 1.5,
+                            fontSize: "0.75rem",
+                            textTransform: "uppercase",
+                            letterSpacing: 1.2,
+                            background: codeTheme.badge,
+                            color: codeTheme.badgeText,
+                            border: `1px solid ${codeTheme.border}`,
+                          }}
+                        >
+                          {selectedSample.language}
+                        </Box>
+                      </Box>
+
+                      <Box
+                        component="pre"
+                        sx={{
+                          flex: 1,
+                          m: 0,
+                          p: 2.5,
+                          borderRadius: 2,
+                          overflow: "auto",
+                          fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
+                          fontSize: "0.9rem",
+                          lineHeight: 1.6,
+                          background: "rgba(0,0,0,0.22)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          color: codeTheme.text,
+                        }}
+                      >
+                        {selectedSample.code}
+                      </Box>
+                    </CardContent>
+                  </ScrollReactiveCard>
+                </Grid>
+              </Grid>
+            </Container>
+          </Box>
+
+          <Divider />
 
       {/* =========================================== */}
       {/* 3D MODELS GALLERY */}
