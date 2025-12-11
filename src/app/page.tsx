@@ -359,35 +359,41 @@ const theme = createTheme({
 // ==================== DATA =====================
 const teamMembers: Array<{
   name: string;
+  role: string;
   background: string;
   avatar?: string;
 }> = [
   {
     name: "Arya Sasikumar",
+    role: "Sensing & Excecution",
     background:
       "Mechanical Engineering & Business major interested in robotics. Well-versed in Solidworks, ROS, Python, and C++.",
     avatar: "/arya.png",
   },
   {
     name: "Gursimar Virk",
+    role: "Manipulation & CAD Engineer",
     background:
       "Mechanical Engineering major and Material Science minor interested in robotics. Works with humanoids; skilled in Solidworks, ROS, Python, and C++.",
     avatar: "/gursimar.jpeg",
   },
   {
     name: "Yamuna Rao",
+    role: "Perception & Planning",
     background:
       "EECS major interested in robotics/optimization. Experience with CV, Python, C, PyTorch, and TensorFlow.",
     avatar: "/yamuna.jpeg",
   },
   {
     name: "Divya Krishnaswamy",
+    role: "Testing & Integration",
     background:
       "Bioengineering major & EECS minor interested in surgical robotics. Experience with Solidworks, C++, Python, and embedded systems.",
     avatar: "/divya.jpeg",
   },
   {
     name: "Patrick O’Connor",
+    role: "Web & CAD Engineer",
     background:
       "Third-year EECS major with interest in EE & robotics. Experience with Fusion, KiCad, and Python.",
     avatar: "/patrick.jpg",
@@ -1054,6 +1060,9 @@ export default function Page() {
                     >
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         {m.name}
+                      </Typography>
+                      <Typography variant="subtitle2" sx={{ fontStyle: "italic", color: "grey.300" }}>
+                        {m.role}
                       </Typography>
                       <Typography variant="body2" sx={{ color: "grey.400" }}>
                         {m.background}
