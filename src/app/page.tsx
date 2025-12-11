@@ -462,37 +462,37 @@ const teamMembers: Array<{
 }> = [
   {
     name: "Arya Sasikumar",
-    role: "Sensing & Excecution",
+    role: "Sensing & Execution",
     background:
-      "Mechanical Engineering & Business major interested in robotics. Well-versed in Solidworks, ROS, Python, and C++.",
+      "Mechanical Engineering and Business student focused on robotics, with experience in Solidworks, ROS, Python, and C++.",
     avatar: "/arya.png",
   },
   {
     name: "Gursimar Virk",
     role: "Manipulation & CAD Engineer",
     background:
-      "Mechanical Engineering major and Material Science minor interested in robotics. Works with humanoids; skilled in Solidworks, ROS, Python, and C++.",
+      "Mechanical Engineering major and Materials Science minor who works with humanoid robots and designs with Solidworks, ROS, Python, and C++.",
     avatar: "/gursimar.jpeg",
   },
   {
     name: "Yamuna Rao",
     role: "Perception & Planning",
     background:
-      "EECS major interested in robotics/optimization. Experience with CV, Python, C, PyTorch, and TensorFlow.",
+      "EECS major interested in robotics and optimization, with experience in computer vision, Python, C, PyTorch, and TensorFlow.",
     avatar: "/yamuna.jpeg",
   },
   {
     name: "Divya Krishnaswamy",
     role: "Testing & Integration",
     background:
-      "Bioengineering major & EECS minor interested in surgical robotics. Experience with Solidworks, C++, Python, and embedded systems.",
+      "Bioengineering major and EECS minor interested in surgical robotics, with experience in Solidworks, C++, Python, and embedded systems.",
     avatar: "/divya.jpg",
   },
   {
     name: "Patrick O’Connor",
     role: "Web & CAD Engineer",
     background:
-      "Third-year EECS major with interest in EE & robotics. Experience with Fusion, KiCad, and Python.",
+      "Third-year EECS major interested in electronics and robotics, with experience in Fusion, KiCad, and Python.",
     avatar: "/patrick.jpg",
   },
 ];
@@ -503,7 +503,7 @@ const codeSamples = [
     label: "ros_launch.py",
     language: "python",
     description:
-      "Launches the RealSense camera and ArUco detector nodes that feed GroceryGizmo's perception stack.",
+      "Launches the RealSense camera and ArUco detector nodes that power GroceryGizmo’s perception stack.",
     code: String.raw`import launch
 from launch_ros.actions import Node
 
@@ -533,7 +533,7 @@ if __name__ == "__main__":
     label: "route-handler.ts",
     language: "typescript",
     description:
-      "Next.js API route that revalidates cached dashboards after a new manipulation log is uploaded.",
+      "Next.js API route that revalidates cached dashboards whenever a new manipulation log is uploaded.",
     code: String.raw`import type { NextRequest } from "next/server";
 import { revalidateTag } from "next/cache";
 
@@ -557,7 +557,7 @@ export const dynamic = "force-dynamic";`,
     label: "deploy.sh",
     language: "bash",
     description:
-      "One-command deploy script that builds the site and syncs static assets to the robot operator console.",
+      "Deployment script that installs dependencies, builds the site, and syncs static assets to the robot operator console.",
     code: String.raw`#!/usr/bin/env bash
 set -euo pipefail
 
@@ -575,9 +575,9 @@ echo "Deployment finished ✅"`,
 ];
 
 const galleryItems = [
-  { src: "/arm.jpg", title: "Omron arm ready for pick" },
-  { src: "/arm2.jpg", title: "Arm reaching into fridge" },
-  { src: "/arm3.JPG", title: "Close-up of gripper" },
+  { src: "/arm.jpg", title: "Omron arm prepared for a pick" },
+  { src: "/arm2.jpg", title: "Arm reaching into the fridge" },
+  { src: "/arm3.JPG", title: "Close-up of the gripper" },
   { src: "/ARCo_detection.JPEG", title: "AR tag pose detection" },
   { src: "/object_detection.JPEG", title: "Object detection pipeline" },
   { src: "/ros.JPG", title: "ROS graph overview" },
@@ -587,7 +587,7 @@ const modelGallery = [
   {
     title: "Camera Mount",
     description:
-      "Custom Intel Realsense mount for Omron robotic arm.",
+      "Custom Intel RealSense mount designed for the Omron robotic arm.",
     src: "/models/mount.obj",
     mtlSrc: "/models/mount.mtl",
   },
@@ -595,7 +595,7 @@ const modelGallery = [
   {
     title: "Color Cube",
     description:
-      "Material-coded reference cube demonstrating MTL-driven shading in the viewer.",
+      "Material-coded reference cube used to demonstrate MTL-based shading in the viewer.",
     src: "/models/cube.obj",
     mtlSrc: "/models/cube.mtl",
   },
@@ -604,37 +604,37 @@ const modelGallery = [
 const systemArchitectureImages = [
   {
     title: "System Pipeline",
-    description: "High-level AR pick-and-place pipeline showing perception through actuation.",
+    description: "High-level pipeline from perception to actuation, showing how the system moves from detection to motion.",
     src: "/sys_arch/SystemPipeline.png",
   },
   {
     title: "Pick Sequence Flow",
-    description: "Step-by-step breakdown of the pick workflow from scanning to retract.",
+    description: "Step-by-step sequence of a pick, from scanning the item to retracting the arm safely.",
     src: "/sys_arch/PickSequenceFlow.png",
   },
   {
     title: "Drop-off Routing Logic",
-    description: "Logic used to route items to the appropriate drop-off locations by AR tag.",
+    description: "Routing logic that assigns items to specific drop-off locations based on AR tags.",
     src: "/sys_arch/Drop-offRoutingLogic.png",
   },
   {
     title: "Data Streams",
-    description: "ROS 2 node connectivity covering camera input, detection, and robot control.",
+    description: "ROS 2 node graph showing how camera, detection, and control nodes exchange data.",
     src: "/sys_arch/DataStreams.png",
   },
   {
     title: "Topic & Service Summary",
-    description: "Topic and service wiring across the ROS 2 stack for GroceryGizmo.",
+    description: "Summary of the topics and services that connect the ROS 2 components in GroceryGizmo.",
     src: "/sys_arch/TopicAndServiceSummary.png",
   },
   {
     title: "TF Frame Hierarchy",
-    description: "Pose graph showing the kinematic chain and AR marker frames.",
+    description: "Transform tree illustrating the kinematic chain and AR marker frames.",
     src: "/sys_arch/TFFrameHierarchy.png",
   },
   {
     title: "Hardware Components",
-    description: "Hardware layout connecting control PC, sensors, and the TM5-700 arm.",
+    description: "Overview of the hardware setup connecting the control PC, sensors, and TM5-700 arm.",
     src: "/sys_arch/HardwareComponents.png",
   },
 ];
@@ -643,35 +643,35 @@ const teamContributions = [
   {
     name: "Arya Sasikumar",
     contributions: [
-      "Integrated the TM5-700 workcell with fridge fixtures and tuned approach trajectories for cramped shelving.",
+      "Integrated the TM5-700 workcell with the fridge fixtures and tuned approach trajectories for tight shelving.",
       "Modeled and fabricated the eye-in-hand RealSense mount and removable AR tag anchors for grocery items.",
     ],
   },
   {
     name: "Gursimar Virk",
     contributions: [
-      "Led manipulation testing, including grasp offset calibration and fridge entry sequencing.",
-      "Developed safety playbooks covering motion stop conditions, soft limits, and manual recovery procedures.",
+      "Led manipulation testing, including grasp offset calibration and safe approach sequences into the fridge.",
+      "Developed safety guidelines for motion stop conditions, soft limits, and manual recovery procedures.",
     ],
   },
   {
     name: "Yamuna Rao",
     contributions: [
-      "Built the perception stack for AR tag detection, TF broadcasting, and nearest-object selection logic.",
-      "Benchmarked IK latency and optimized MoveIt2 request batching for quicker pick-place cycles.",
+      "Built the perception stack for AR tag detection, TF broadcasting, and logic for selecting the nearest object.",
+      "Benchmarked IK latency and tuned MoveIt2 request batching to reduce pick-and-place cycle time.",
     ],
   },
   {
     name: "Divya Krishnaswamy",
     contributions: [
-      "Authored the ROS 2 task manager that sequences sensing, planning, and actuation for each grocery item.",
-      "Managed gripper force profiling and validation on fragile items to prevent bruising or slips.",
+      "Implemented the ROS 2 task manager that coordinates sensing, planning, and actuation for each grocery item.",
+      "Profiled gripper force and validated grasp settings on fragile items to avoid bruising or slips.",
     ],
   },
   {
     name: "Patrick O’Connor",
     contributions: [
-      "Implemented the Next.js project site, system dashboards, and logging utilities for demo prep.",
+      "Built the Next.js project site, dashboards, and logging utilities used during demos.",
       "Maintained integration scripts between the TM driver, Modbus gripper control, and dashboard telemetry.",
     ],
   },
@@ -681,27 +681,27 @@ const hardwareComponents = [
   {
     name: "Omron TM5-700 Collaborative Arm",
     detail:
-      "Six degree-of-freedom manipulator executing pick-and-place trajectories with 700 mm reach and built-in safety monitoring.",
+      "Six degree-of-freedom manipulator executing pick-and-place trajectories with a 700 mm reach and integrated safety monitoring.",
   },
   {
     name: "Robotiq 2F-85 Gripper",
     detail:
-      "Modbus-controlled parallel gripper with configurable closure values matched to each AR tag class.",
+      "Modbus-controlled parallel gripper with configurable closure values that are tuned per AR tag class.",
   },
   {
     name: "Intel RealSense D435",
     detail:
-      "Eye-in-hand RGB-D camera providing aligned depth for ArUco pose estimation in cluttered fridge scenes.",
+      "Eye-in-hand RGB-D camera that provides aligned depth images for ArUco pose estimation in cluttered fridge scenes.",
   },
   {
     name: "Control PC (Ubuntu 22.04)",
     detail:
-      "Runs ROS 2 Humble within Distrobox, MoveIt2 planners, Tkinter GUI, and trajectory logging utilities.",
+      "Runs ROS 2 Humble inside Distrobox, along with MoveIt2 planners, a Tkinter GUI, and trajectory logging tools.",
   },
   {
     name: "Custom AR Tag Fixtures",
     detail:
-      "3D-printed mounts and laminated tags that survive condensation while giving the camera crisp fiducials.",
+      "3D-printed mounts and laminated tags designed to withstand condensation while remaining easy for the camera to read.",
   },
 ];
 
@@ -709,37 +709,37 @@ const softwareModules = [
   {
     name: "Perception Pipeline",
     bullets: [
-      "Intel RealSense ROS 2 driver publishes synchronized RGB and depth frames to /camera topics.",
-      "Custom ArUco detector service thresholds markers and broadcasts marker TF frames into tf2.",
-      "Camera-to-base calibration maintains accurate transforms for downstream planning queries.",
+      "The Intel RealSense ROS 2 driver publishes synchronized RGB and depth frames on camera topics.",
+      "A custom ArUco detector service finds markers and broadcasts marker frames through tf2.",
+      "Camera-to-base calibration keeps transforms accurate so planning queries remain reliable.",
     ],
   },
   {
     name: "Task Manager",
     bullets: [
-      "robot_gui_recorder node maintains a priority queue of detected groceries by reach distance.",
-      "Requests MoveIt2 /compute_ik for approach, grasp, and place poses with collision margins.",
-      "Streams gripper commands and logs telemetry for replay during debugging sessions.",
+      "The robot_gui_recorder node keeps a queue of detected groceries, sorted by how easy they are to reach.",
+      "It requests MoveIt2 /compute_ik for approach, grasp, and place poses with collision margins.",
+      "It streams gripper commands and logs telemetry so runs can be replayed and debugged later.",
     ],
   },
   {
     name: "Motion Execution",
     bullets: [
-      "tm_driver wrapper sends joint-space trajectories with safety velocity caps and soft limits.",
-      "Interlocks fridge entry waypoints to keep the elbow clear of door edges and shelving.",
-      "Exception handling pauses the cycle on TF dropout, gripper timeouts, or unexpected torque spikes.",
+      "A tm_driver wrapper sends joint-space trajectories with conservative velocities and soft joint limits.",
+      "Fridge entry waypoints keep the elbow and wrist clear of the door and shelving edges.",
+      "Exception handling pauses the cycle if TF frames drop out, the gripper times out, or unexpected torques are detected.",
     ],
   },
 ];
 
 const systemWorkflow = [
-  "RealSense D435 publishes aligned RGB-D frames through realsense2_camera_node.",
-  "ar_tag_detector_service identifies grocery and shelf markers, pushing transforms into tf2.",
-  "robot_gui_recorder selects the nearest viable grocery tag and pairs it with its fridge destination.",
-  "MoveIt2 /compute_ik solves approach, grasp, and placement joint targets with collision checks.",
-  "tm_driver executes the point-to-point trajectory while logging joint states for verification.",
-  "Modbus gripper closes on the item, confirms force, and reopens after the placement target is reached.",
-  "System resets to the scan pose, updates remaining inventory, and loops until the queue is empty.",
+  "The RealSense D435 publishes aligned RGB-D frames through the realsense2_camera_node.",
+  "The ar_tag_detector_service finds grocery and shelf markers and publishes their transforms into tf2.",
+  "The robot_gui_recorder node picks the closest valid grocery tag and pairs it with a fridge destination.",
+  "MoveIt2 /compute_ik solves for approach, grasp, and placement joint targets while checking for collisions.",
+  "The tm_driver executes the trajectory and logs joint states for later analysis.",
+  "The Modbus gripper closes on the item, verifies force, and reopens after the item is placed.",
+  "The system returns to the scan pose, updates which items remain, and repeats until the queue is empty.",
 ];
 
 const implementationMedia = [
@@ -761,22 +761,22 @@ const resultHighlights = [
   {
     title: "Pick success rate",
     detail:
-      "8 out of 10 grocery items were placed correctly during final integrated dry runs with door clearance checks.",
+      "In final integrated dry runs, 8 out of 10 grocery items were placed correctly with door and shelf clearance checks.",
   },
   {
     title: "Average cycle time",
     detail:
-      "72 seconds from detection to placement, dominated by cautious fridge entry and exit waypoints.",
+      "The average time from detection to placement was about 72 seconds, mostly due to careful entry and exit motions in the fridge.",
   },
   {
     title: "System reliability",
     detail:
-      "No collisions recorded after adding approach offsets; two runs paused for temporary TF dropouts that recovered automatically.",
+      "After adding approach offsets, no collisions were recorded. Two runs paused because of temporary TF dropouts that resolved on their own.",
   },
 ];
 
 const resultMedia = [
-  { src: "/arm2.jpg", title: "Arm reaching into fridge" },
+  { src: "/arm2.jpg", title: "Arm reaching into the fridge" },
   { src: "/ARCo_detection.JPEG", title: "AR tag pose detection" },
   { src: "/ros.JPG", title: "ROS graph overview" },
 ];
@@ -787,22 +787,22 @@ const demoVideoUrl =
 const additionalMaterials = [
   {
     label: "Codebase",
-    description: "Full Next.js site and project assets stored in this repository (FinalProject/grocerygizmo).",
+    description: "Full Next.js site and project assets in the FinalProject/grocerygizmo repository.",
     href: "https://github.com/pchrisoc/GroceryGizmo/tree/main/FinalProject/grocerygizmo",
   },
   {
     label: "ROS 2 launch + nodes",
-    description: "Perception, task orchestration, and TM driver wrappers documented in FinalProject/sysarch.js.",
+    description: "Perception, task orchestration, and TM driver wrappers described in FinalProject/sysarch.js.",
     href: "https://github.com/pchrisoc/GroceryGizmo/blob/main/FinalProject/sysarch.js",
   },
   {
     label: "CAD models",
-    description: "3MF assets for camera mounts and workspace props (FinalProject/ARCO.3mf, Cube1.3mf, Sphere.3mf, etc.).",
+    description: "3MF assets for camera mounts and workspace props, including ARCO.3mf, Cube1.3mf, Sphere.3mf, and more.",
     href: "https://github.com/pchrisoc/GroceryGizmo/tree/main/FinalProject",
   },
   {
     label: "Datasheets",
-    description: "Intel RealSense D435, Omron TM5-700, and Robotiq 2F-85 references for hardware configuration.",
+    description: "Hardware references for the Intel RealSense D435, Omron TM5-700, and Robotiq 2F-85.",
     href: "https://www.intelrealsense.com/depth-camera-d435/",
   },
   {
@@ -1063,8 +1063,7 @@ export default function Page() {
               </Typography>
 
               <Typography variant="body1" sx={{ mb: 3, color: "grey.300" }}>
-                A six-axis Omron robot arm that identifies groceries using AR
-                tags and autonomously loads them into a real refrigerator.
+                A six-degree-of-freedom Omron robot arm that uses AR tags to recognize groceries and autonomously load them into a real refrigerator.
               </Typography>
 
               <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
@@ -1118,11 +1117,10 @@ export default function Page() {
                 </Box>
                 <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    Omron TM5-700 + Robotiq Gripper
+                    Omron TM5-700 with Robotiq Gripper
                   </Typography>
                   <Typography variant="body2" sx={{ color: "grey.400", lineHeight: 1.6 }}>
-                    Drag, pinch, and orbit the full TM5 model to explore our workspace clearances and
-                    wrist-mounted RealSense rig directly in the browser.
+                    You can drag, pinch, and orbit the full TM5 model to see the workspace clearances and wrist-mounted RealSense setup directly in the browser.
                   </Typography>
                 </CardContent>
               </ScrollReactiveCard>
@@ -1157,10 +1155,10 @@ export default function Page() {
                 The Problem
               </Typography>
               <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                For many people, putting groceries into the fridge is more than a chore — it’s a physical challenge. Reaching into deep shelves, bending down repeatedly, lifting items overhead, and navigating crowded compartments can be exhausting or unsafe for elderly adults, disabled individuals, short users, or anyone with limited mobility.
+                For a lot of people, putting groceries into the fridge is more than just a small chore. It can be physically demanding and uncomfortable, especially when items are heavy, shelves are deep, or space is tight. Reaching high shelves, bending down over and over, and twisting around open doors can be hard or unsafe for older adults, people with limited mobility, shorter users, or anyone dealing with fatigue or injury.
               </Typography>
               <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                And beyond the physical strain, there’s the mental load: figuring out where everything fits in a cluttered, irregular fridge layout. Robots don’t get frustrated by tight spaces or overstuffed shelves — but getting them to understand and navigate those spaces is surprisingly hard.
+                On top of that, there is a constant mental task of figuring out where everything should go in a crowded, messy fridge. Robots do not get tired or frustrated by cramped spaces, but teaching a robot to understand those spaces and move safely inside them is a real challenge.
               </Typography>
             </CardContent>
           </ScrollReactiveCard>
@@ -1180,27 +1178,27 @@ export default function Page() {
                     Our Solution
                   </Typography>
                   <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                    GroceryGizmo is an autonomous fridge-loading robot that uses AR tags, computer vision, and a 6-DOF Omron arm to handle both the seeing and the doing:
+                    GroceryGizmo is an autonomous fridge-loading system that uses AR tags, computer vision, and a six-degree-of-freedom Omron arm to handle both perception and manipulation:
                   </Typography>
                   <Box component="ul" sx={{ pl: 3, color: "grey.200", lineHeight: 1.7, m: 0 }}>
                     <li>
                       <Typography component="span" sx={{ color: "grey.200" }}>
-                        Sensing: The camera detects AR-tagged grocery items and AR-tagged fridge placements.
+                        Sensing: The camera detects AR-tagged grocery items on the counter and AR-tagged slots inside the fridge.
                       </Typography>
                     </li>
                     <li>
                       <Typography component="span" sx={{ color: "grey.200" }}>
-                        Planning: The system chooses the closest item, works out where it belongs, and computes a safe pose in the robot’s base frame.
+                        Planning: The system picks the closest item, decides where it should go, and computes a safe pose in the robot’s base frame.
                       </Typography>
                     </li>
                     <li>
                       <Typography component="span" sx={{ color: "grey.200" }}>
-                        Actuation: The arm picks up the item and places it exactly where it’s meant to go — even in tight, awkward fridge compartments.
+                        Actuation: The arm picks up each item and places it in its assigned location, even in tight, awkward spaces inside the fridge.
                       </Typography>
                     </li>
                   </Box>
                   <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                    It’s a complete end-to-end pipeline designed to make a robot genuinely useful in a real household task.
+                    The result is a full pipeline that shows how a robot can handle a real household task from start to finish.
                   </Typography>
                 </CardContent>
               </ScrollReactiveCard>
@@ -1220,27 +1218,27 @@ export default function Page() {
                     The Impact
                   </Typography>
                   <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                    As AI reshapes the world, we want robotics to support people — not replace meaningful work, but relieve the exhausting, repetitive, or physically inaccessible parts of daily life.
+                    As AI and robotics become more common, we want them to support people in everyday life, not just in factories. The goal is not to replace meaningful work, but to offload tasks that are repetitive, physically demanding, or simply out of reach for many people.
                   </Typography>
                   <Box component="ul" sx={{ pl: 3, color: "grey.200", lineHeight: 1.7, m: 0 }}>
                     <li>
                       <Typography component="span" sx={{ color: "grey.200" }}>
-                        elderly individuals stay independent,
+                        Older adults can stay independent longer.
                       </Typography>
                     </li>
                     <li>
                       <Typography component="span" sx={{ color: "grey.200" }}>
-                        people with limited mobility avoid risky bending or lifting,
+                        People with limited mobility avoid risky bending, lifting, and twisting.
                       </Typography>
                     </li>
                     <li>
                       <Typography component="span" sx={{ color: "grey.200" }}>
-                        and busy households offload a chore that always seems to take too long.
+                        Busy households can hand off a small but constant source of work.
                       </Typography>
                     </li>
                   </Box>
                   <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                    GroceryGizmo is a step toward home robots that make everyday living a little easier — one grocery item at a time.
+                    GroceryGizmo is one step toward assistive home robots that quietly take care of the small, tiring tasks in the background.
                   </Typography>
                 </CardContent>
               </ScrollReactiveCard>
@@ -1261,7 +1259,7 @@ export default function Page() {
             Team
           </Typography>
           <Typography sx={{ color: "grey.400", mb: 4 }}>
-            A multidisciplinary team from EECS, ME, BioE & Business.
+            A multidisciplinary team from EECS, Mechanical Engineering, Bioengineering, and Business.
           </Typography>
 
           <Grid container spacing={3}>
@@ -1497,7 +1495,7 @@ export default function Page() {
                     Detect grocery items using AR tags
                   </Typography>
                   <Typography sx={{ color: "grey.300", lineHeight: 1.7 }}>
-                    The robot must reliably see AR-tagged objects on the counter and compute their 3D position in space, regardless of object shape or orientation.
+                    The robot must reliably detect AR-tagged objects on the counter and estimate their 3D positions, regardless of how each item is oriented.
                   </Typography>
                 </Box>
                 <Box>
@@ -1505,7 +1503,7 @@ export default function Page() {
                     Identify placement locations inside the fridge
                   </Typography>
                   <Typography sx={{ color: "grey.300", lineHeight: 1.7 }}>
-                    AR tags inside the refrigerator provide fixed anchor points the robot can recognize and navigate toward.
+                    AR tags inside the refrigerator act as labeled anchor points, telling the robot exactly where each item should be placed.
                   </Typography>
                 </Box>
                 <Box>
@@ -1513,7 +1511,7 @@ export default function Page() {
                     Determine which item to pick first
                   </Typography>
                   <Typography sx={{ color: "grey.300", lineHeight: 1.7 }}>
-                    The system should automatically choose the closest grocery item to minimize unnecessary motion and make the workflow efficient.
+                    The system should automatically pick the closest reachable item to reduce motion and keep the workflow efficient.
                   </Typography>
                 </Box>
                 <Box>
@@ -1521,7 +1519,7 @@ export default function Page() {
                     Transform camera detections into robot coordinates
                   </Typography>
                   <Typography sx={{ color: "grey.300", lineHeight: 1.7 }}>
-                    Accurate frame transformations are essential so the Omron arm can move to the correct pre-grasp and placement poses.
+                    Accurate coordinate transforms are crucial so the Omron arm can move to the correct pre-grasp and placement poses in its own base frame.
                   </Typography>
                 </Box>
                 <Box>
@@ -1529,7 +1527,7 @@ export default function Page() {
                     Grasp and place items safely
                   </Typography>
                   <Typography sx={{ color: "grey.300", lineHeight: 1.7 }}>
-                    The robot must approach items with a safe offset, lower the gripper for a stable grasp, enter the fridge without collisions, and set items into their tagged locations.
+                    The robot should approach with a safe offset, lower the gripper for a stable grasp, move through the fridge without collisions, and place items gently at their tagged locations.
                   </Typography>
                 </Box>
               </Box>
@@ -1553,32 +1551,32 @@ export default function Page() {
               <Box component="ul" sx={{ pl: 3, color: "grey.200", lineHeight: 1.7, m: 0 }}>
                 <li>
                   <Typography component="span" sx={{ color: "grey.200" }}>
-                    Perceive items on a counter
+                    Perceive items on a counter.
                   </Typography>
                 </li>
                 <li>
                   <Typography component="span" sx={{ color: "grey.200" }}>
-                    Decide where each item belongs
+                    Decide where each item belongs inside the fridge.
                   </Typography>
                 </li>
                 <li>
                   <Typography component="span" sx={{ color: "grey.200" }}>
-                    Plan reachable poses for grasping and placing
+                    Plan reachable poses for grasping and placing each item.
                   </Typography>
                 </li>
                 <li>
                   <Typography component="span" sx={{ color: "grey.200" }}>
-                    Move the arm through the constrained fridge space
+                    Move the arm safely through the constrained fridge space.
                   </Typography>
                 </li>
                 <li>
                   <Typography component="span" sx={{ color: "grey.200" }}>
-                    Gently and accurately place groceries in their correct spots
+                    Place groceries accurately and gently in their intended spots.
                   </Typography>
                 </li>
               </Box>
               <Typography sx={{ color: "grey.200", lineHeight: 1.7 }}>
-                Together, these criteria ensure the robot behaves in a predictable, useful, and safe way — bringing us closer to assistive home robotics that can handle everyday tasks without constant human oversight.
+                Together, these criteria guide GroceryGizmo toward being predictable, safe, and actually helpful in a real kitchen setting instead of just a lab environment.
               </Typography>
             </CardContent>
           </ScrollReactiveCard>
@@ -1597,14 +1595,13 @@ export default function Page() {
             Implementation
           </Typography>
           <Typography sx={{ color: "grey.300", mb: 4, lineHeight: 1.7 }}>
-            The GroceryGizmo stack combines collaborative-grade hardware with ROS 2 software, MoveIt2 planning, and a lightweight GUI to shepherd each grocery item from the counter into its tagged shelf. Below are the key components, supporting software, and the full pipeline we deployed.
+            The GroceryGizmo stack combines collaborative robot hardware with ROS 2, MoveIt2 planning, and a lightweight GUI. Each grocery item is scanned on the counter, matched to a location in the fridge, and moved along a planned trajectory that respects the door, shelves, and workspace limits.
           </Typography>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
             System Architecture
           </Typography>
           <Typography sx={{ color: "grey.400", mb: 4 }}>
-            Expand each diagram to explore the perception, planning, and hardware
-            layers of GroceryGizmo.
+            Expand each diagram to explore how perception, planning, and hardware all connect in GroceryGizmo.
           </Typography>
 
           <Grid container spacing={3}>
@@ -1674,7 +1671,7 @@ export default function Page() {
                 Code
               </Typography>
               <Typography sx={{ color: "grey.400", mb: 4 }}>
-                Peek at the snippets that launch perception, revalidate dashboards, and deploy GroceryGizmo with a single command.
+                Take a look at a few representative snippets that launch perception, refresh dashboards, and deploy GroceryGizmo with a single command.
               </Typography>
 
               <Grid container spacing={4} alignItems="stretch">
@@ -1697,7 +1694,7 @@ export default function Page() {
                           Select a file to explore
                         </Typography>
                         <Typography sx={{ color: "grey.300", mt: 1.5, lineHeight: 1.7 }}>
-                          Three representative files trace the end-to-end pipeline: ROS launch, web API revalidation, and the deployment helper script.
+                          These three files illustrate key parts of the system: the ROS launch file, a web API route for cache invalidation, and a deployment helper script.
                         </Typography>
                       </Box>
 
@@ -1804,8 +1801,7 @@ export default function Page() {
             3D Models Gallery
           </Typography>
           <Typography sx={{ color: "grey.400", mb: 4 }}>
-            Browse the simplified CAD assets we use for workspace layout,
-            storage design, and reach studies inside the planning pipeline.
+            Explore the simplified CAD assets we use to plan the workspace layout, storage locations, and reachability inside the fridge.
           </Typography>
 
           <Grid container spacing={4}>
@@ -1865,7 +1861,7 @@ export default function Page() {
             Results
           </Typography>
           <Typography sx={{ color: "grey.300", mb: 4, lineHeight: 1.7 }}>
-            We validated GroceryGizmo on a countertop-to-fridge workflow with AR-tagged groceries of varying shapes. The system performed full autonomous pick-and-place cycles, logged motion telemetry, and showcased the interaction between perception, planning, and manipulation.
+            We evaluated GroceryGizmo on a full countertop-to-fridge workflow using AR-tagged groceries of different shapes and sizes. The system executed autonomous pick-and-place cycles, logged motion telemetry, and demonstrated how perception, planning, and manipulation interact in a real setup.
           </Typography>
           <ScrollReactiveCard
             accentKey="results-demo"
@@ -1909,7 +1905,7 @@ export default function Page() {
             Conclusion
           </Typography>
           <Typography sx={{ color: "grey.300", mb: 3, lineHeight: 1.7 }}>
-            GroceryGizmo met its core design criteria by detecting groceries, aligning fridge placements, and executing constrained pick-and-place trajectories. The robot handled multiple item classes without collisions and maintained consistent localization accuracy across runs.
+            GroceryGizmo met its main design goals: it could detect groceries, match them to fridge placements, and execute constrained pick-and-place motions. The robot handled several item types without collisions and maintained consistent localization accuracy across repeated runs.
           </Typography>
 
           <Typography variant="h6" sx={{ fontWeight: 600, mb: 1.5 }}>
@@ -1918,17 +1914,17 @@ export default function Page() {
           <Box component="ul" sx={{ pl: 3, color: "grey.300", lineHeight: 1.7, mb: 3 }}>
             <li>
               <Typography component="span" sx={{ color: "grey.300" }}>
-                Managing depth sensor noise on reflective packaging required tuning detection thresholds and adding pass-through filters.
+                Dim or reflective light prevented stable AR code detection.
               </Typography>
             </li>
             <li>
               <Typography component="span" sx={{ color: "grey.300" }}>
-                Coordinating fridge entry angles with a wrist-mounted camera demanded iterative offset calibration.
+                Coordinating entry angles into the fridge with a wrist-mounted camera took several rounds of offset calibration.
               </Typography>
             </li>
             <li>
               <Typography component="span" sx={{ color: "grey.300" }}>
-                Ensuring Modbus gripper timing aligned with TM driver feedback loops introduced additional state checks.
+                Lining up Robotiq gripper with the edges of each unique object proved difficult.
               </Typography>
             </li>
           </Box>
@@ -1939,17 +1935,17 @@ export default function Page() {
           <Box component="ul" sx={{ pl: 3, color: "grey.300", lineHeight: 1.7 }}>
             <li>
               <Typography component="span" sx={{ color: "grey.300" }}>
-                Fridge organization still depends on AR tags; expanding to vision-based item classification is a natural extension.
+                The current system depends on AR tags for both groceries and fridge locations. An obvious next step is using vision-based item recognition and shelf detection instead of printed markers.
               </Typography>
             </li>
             <li>
               <Typography component="span" sx={{ color: "grey.300" }}>
-                The current workflow assumes the fridge door is already open; automating door manipulation remains future work.
+                Our workflow ends with the fridge door open. Adding a closing door manipulation would make the system more fully autonomous.
               </Typography>
             </li>
             <li>
               <Typography component="span" sx={{ color: "grey.300" }}>
-                Adding tactile sensing could further reduce slip risk for heavier or deformable items.
+                Integrating tactile sensing in the gripper could further reduce slip risk and improve handling of heavier or softer items.
               </Typography>
             </li>
           </Box>
