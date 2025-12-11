@@ -782,7 +782,7 @@ const resultMedia = [
 ];
 
 const demoVideoUrl =
-  "https://drive.google.com/file/d/1sSn59fT9UaXw09uU73KojV-ZqYzFssF2/view?usp=sharing";
+  "https://drive.google.com/file/d/1sSn59fT9UaXw09uU73KojV-ZqYzFssF2/preview";
 
 const additionalMaterials = [
   {
@@ -1878,7 +1878,7 @@ export default function Page() {
             <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Box
                 component="iframe"
-                src="https://drive.google.com/file/d/1nBBwt9rWLdB6iRijCdiFLPdSFuZzn3BH/preview"
+                src="https://drive.google.com/file/d/1sSn59fT9UaXw09uU73KojV-ZqYzFssF2/preview"
                 title="GroceryGizmo Demo Video"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
