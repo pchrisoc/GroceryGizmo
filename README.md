@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GroceryGizmo (EECS 106A Final Project)
 
-## Getting Started
+Project site for **GroceryGizmo**: a robot grocery assistant that uses **AR tags**, **ROS 2**, and an **Omron TM5-700** arm to pick groceries from a counter and place them into a real refrigerator.
 
-First, run the development server:
+This repo contains the **Next.js App Router** site used for the final writeup, media gallery, interactive system diagrams, and an in-browser **OBJ/MTL 3D model viewer**.
+
+### Highlights
+
+- Single-page report layout with sections: Introduction, Team, Design, Implementation, Code, 3D Models, Results, Conclusion.
+- 3D viewer built with `@react-three/fiber` + `three` (loads `.obj` + optional `.mtl` from `public/`).
+- Responsive navigation with desktop + mobile drawer.
+- Static assets (team photos, demo images, system architecture diagrams) served from `public/`.
+
+## Tech Stack
+
+- Next.js (App Router)
+- React + TypeScript
+- Material UI (MUI)
+- three.js + react-three-fiber (`@react-three/fiber`, `@react-three/drei`)
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+ recommended
+- `pnpm` recommended (a `pnpm-lock.yaml` is included)
+
+### Install + run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Other scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm build
+pnpm start
+pnpm lint
+```
 
-## Learn More
+## Project Layout
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app/page.tsx` — Main one-page site content (sections, data, media lists, etc.)
+- `src/app/components/ObjViewer.tsx` — Client-only OBJ/MTL viewer component (OrbitControls + optional autorotate)
+- `public/models/` — 3D assets (`.obj` + `.mtl`)
+- `public/sys_arch/` — System architecture diagrams used in the Implementation section
+- `public/` — Photos and additional images used throughout the page
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Updating Content
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Add a new 3D model
 
-## Deploy on Vercel
+1. Put the files in `public/models/` (e.g. `my_part.obj` and `my_part.mtl`).
+2. Add an entry to the `modelGallery` array in `src/app/page.tsx`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Add/replace images
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Drop images into `public/` (or a subfolder) and reference them with absolute paths like `/arm.jpg` or `/sys_arch/SystemPipeline.png`.
+
+## Notes
+
+- The 3D viewer is imported with `dynamic(..., { ssr: false })` to avoid server-side rendering issues with WebGL/Three.js.
+- If a model has no `.mtl`, the viewer falls back to a reasonable default material color.
+
+## Demo Video
+
+The Results section embeds the demo video via Google Drive:
+
+- `https://drive.google.com/file/d/1sSn59fT9UaXw09uU73KojV-ZqYzFssF2/preview`
+
+## Deployment
+
+This is a standard Next.js app and can be deployed anywhere Next.js is supported (Vercel, a VM, or a robot-side console). A typical deploy flow is:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+pnpm start
+```
+
+## Credits
+
+GroceryGizmo team: Arya Sasikumar, Gursimar Virk, Yamuna Rao, Divya Krishnaswamy, Patrick O’Connor.

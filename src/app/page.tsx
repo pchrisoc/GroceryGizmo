@@ -188,6 +188,14 @@ const CODE_THEME_MAP: Record<
     badgeText: string;
   }
 > = {
+  markdown: {
+    background: "linear-gradient(160deg, rgba(46,38,16,0.92), rgba(20,16,6,0.96))",
+    border: "rgba(255,229,138,0.55)",
+    glow: "0 22px 52px rgba(255,229,138,0.16)",
+    text: "#fff8e1",
+    badge: "rgba(255,229,138,0.16)",
+    badgeText: "#ffe58a",
+  },
   python: {
     background: "linear-gradient(160deg, rgba(12,38,33,0.92), rgba(6,18,20,0.96))",
     border: "rgba(127,255,212,0.45)",
@@ -204,6 +212,14 @@ const CODE_THEME_MAP: Record<
     badge: "rgba(122,184,255,0.18)",
     badgeText: "#7ab8ff",
   },
+  xml: {
+    background: "linear-gradient(160deg, rgba(10,36,46,0.92), rgba(6,14,20,0.96))",
+    border: "rgba(159,229,255,0.5)",
+    glow: "0 22px 52px rgba(159,229,255,0.16)",
+    text: "#eaf9ff",
+    badge: "rgba(159,229,255,0.16)",
+    badgeText: "#9fe5ff",
+  },
   bash: {
     background: "linear-gradient(160deg, rgba(18,39,24,0.92), rgba(8,18,14,0.96))",
     border: "rgba(125,255,181,0.45)",
@@ -211,6 +227,14 @@ const CODE_THEME_MAP: Record<
     text: "#e8ffef",
     badge: "rgba(125,255,181,0.16)",
     badgeText: "#7dffb5",
+  },
+  ini: {
+    background: "linear-gradient(160deg, rgba(44,28,18,0.92), rgba(18,12,8,0.96))",
+    border: "rgba(255,196,155,0.5)",
+    glow: "0 22px 48px rgba(255,196,155,0.16)",
+    text: "#fff2ea",
+    badge: "rgba(255,196,155,0.16)",
+    badgeText: "#ffc49b",
   },
   default: {
     background: "linear-gradient(160deg, rgba(24,27,44,0.92), rgba(8,10,19,0.96))",
@@ -499,78 +523,630 @@ const teamMembers: Array<{
 
 const codeSamples = [
   {
-    value: "ros-launch",
-    label: "ros_launch.py",
+    value: "tm5-setup-py",
+    label: "src/tm5_grocery_gizmo/setup.py",
+    language: "python",
+    description: "Setuptools entry points for ROS 2 console scripts (GUI, gripper, AR detection).",
+    code: String.raw`from setuptools import find_packages, setup
+import os
+from glob import glob
+
+package_name = 'tm5_grocery_gizmo'
+
+setup(
+    name=package_name,
+    version='0.0.0',
+    packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+    ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    maintainer='arya',
+    maintainer_email='arya@todo.todo',
+    description='Custom applications for TM5-700 robot',
+    license='MIT',
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
+    entry_points={
+        'console_scripts': [
+            'save_camera_images = tm5_grocery_gizmo.camera_image_saver:main',
+            'gripper_control = tm5_grocery_gizmo.robotiq_gripper_control:main',
+            'gripper_tmscript = tm5_grocery_gizmo.robotiq_gripper_tmscript:main',
+            'gripper_variable = tm5_grocery_gizmo.robotiq_gripper_variable:main',
+            'gripper_position_control = tm5_grocery_gizmo.robotiq_gripper_position_control:main',
+            'robot_gui = tm5_grocery_gizmo.robot_joint_gui:main',
+            'robot_gui_smooth = tm5_grocery_gizmo.robot_joint_gui_smooth:main',
+            'robot_gui_camera = tm5_grocery_gizmo.robot_joint_gui_camera:main',
+            'robot_gui_leader = tm5_grocery_gizmo.robot_joint_gui_leader:main',
+            'robot_gui_recorder = tm5_grocery_gizmo.robot_joint_gui_recorder:main',
+            'ar_tag_detector_service = tm5_grocery_gizmo.ar_tag_detector_service:main',
+        ],
+    },
+)
+`,
+  },
+  {
+    value: "tm5-launch",
+    label: "src/tm5_grocery_gizmo/launch/launch.py",
     language: "python",
     description:
-      "Launches the RealSense camera and ArUco detector nodes that power GroceryGizmo’s perception stack.",
-    code: String.raw`import launch
+      "ROS 2 launch file that starts the TM driver, state publisher, transforms, RealSense, AR detection, MoveIt, and the GUI node.",
+    code: String.raw`#!/usr/bin/env python3
+"""
+Launch file for entire GroceryGizmo system on TM5-700 robot
+Runs all nodes required for full autonomous pipeline
+"""
+
+from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch.actions import OpaqueFunction
+from launch_ros.substitutions import FindPackageShare
+from moveit_configs_utils import MoveItConfigsBuilder
+import os
+
+
+def launch_setup(context, *args, **kwargs):
+    """Appends all nodes required to run to launch full project pipeline"""
+    robot_ip = LaunchConfiguration('robot_ip').perform(context)
+    enable_realsense = LaunchConfiguration('enable_realsense').perform(context)
+    
+    nodes = []
+    
+    # TM5-700 controller
+    tm_driver_node = Node(
+        package='tm_driver',
+        executable='tm_driver',
+        name='tm_driver',
+        arguments=['robot_ip:=' + robot_ip],
+        output='screen'
+    )
+    nodes.append(tm_driver_node)
+    
+    # TF tree for robot state
+    urdf_file = os.path.join(
+        FindPackageShare('tm_description').find('tm_description'),
+        'urdf',
+        'tm5x-700-nominal.urdf'
+    )
+    
+    with open(urdf_file, 'r') as f:
+        robot_description = f.read()
+    
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'robot_description': robot_description,
+            'publish_frequency': 100.0,
+            'use_sim_time': False,
+        }],
+        remappings=[
+            ('/joint_states', '/joint_states'),
+        ]
+    )
+    nodes.append(robot_state_publisher_node)
+    
+    # Camera to flange transform
+    camera_static_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_to_flange_broadcaster',
+        arguments=[
+            '0.05', '0.05', '0.152',
+            '1.5708', '-1.5708', '3.1416',
+            'flange',
+            'camera_link'
+        ]
+    )
+    nodes.append(camera_static_tf_node)
+    
+    # RealSense camera
+    if enable_realsense == 'true':
+        realsense_node = Node(
+            package='realsense2_camera',
+            executable='realsense2_camera_node',
+            name='realsense2_camera_node',
+            parameters=[{
+                'rgb_camera.color_profile': '1920x1080x30',
+                'depth_module.depth_profile': '848x480x30',
+                'depth_module.infra_profile': '848x480x30',
+                'enable_color': True,
+                'enable_depth': True,
+                'enable_infra1': True,
+                'pointcloud.enable': False,
+                'align_depth.enable': False
+            }],
+            output='screen'
+        )
+        nodes.append(realsense_node)
+    
+    # AR tag detection
+    ar_tag_detector_node = Node(
+        package='tm5_grocery_gizmo',
+        executable='ar_tag_detector_service',
+        name='ar_tag_detector_service',
+        output='screen',
+        parameters=[{
+            'marker_size': 0.06,
+            'aruco_dict': 'DICT_4X4_50',
+        }]
+    )
+    nodes.append(ar_tag_detector_node)
+    
+    # MoveIt for planning & IK
+    moveit_config = MoveItConfigsBuilder("tm5x-700", package_name="tm5x-700_moveit_config").to_moveit_configs()
+    
+    move_group_node = Node(
+        package='moveit_ros_move_group',
+        executable='move_group',
+        output='screen',
+        parameters=[
+            moveit_config.to_dict(),
+            {'use_sim_time': False},
+        ],
+    )
+    nodes.append(move_group_node)
+    
+    # GUI for monitoring joint positions & interacting with robot
+    robot_gui_node = Node(
+        package='tm5_grocery_gizmo',
+        executable='robot_gui_recorder',
+        name='robot_gui_recorder',
+        output='screen',
+        emulate_tty=True
+    )
+    nodes.append(robot_gui_node)
+    
+    return nodes
 
 
 def generate_launch_description():
-    return launch.LaunchDescription([
-        Node(
-            package="realsense2_camera",
-            executable="realsense2_camera_node",
-            name="camera",
-            parameters=[{"rgb_module.profile": "640x480x30"}],
+    """Declares runtime arguments and runs all necessary nodes to launch pipeline"""
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            'robot_ip',
+            default_value='169.254.242.84',
+            description='IP address of the TM5-700 robot'
         ),
-        Node(
-            package="aruco_detector",
-            executable="detector",
-            output="screen",
-            parameters=[{"publish_tf": True}],
+        DeclareLaunchArgument(
+            'enable_realsense',
+            default_value='true',
+            description='Enable RealSense camera node'
         ),
+        OpaqueFunction(function=launch_setup)
     ])
-
-
-if __name__ == "__main__":
-    launch.LaunchService(argv=[]).run(generate_launch_description())`,
+`,
   },
   {
-    value: "api-handler",
-    label: "route-handler.ts",
-    language: "typescript",
+    value: "ar-tag-detector-service",
+    label: "src/tm5_grocery_gizmo/my_tm5_apps_v2/ar_tag_detector_service.py",
+    language: "python",
     description:
-      "Next.js API route that revalidates cached dashboards whenever a new manipulation log is uploaded.",
-    code: String.raw`import type { NextRequest } from "next/server";
-import { revalidateTag } from "next/cache";
+      "Controllable AR tag detection node with a SetBool service, pose estimation via solvePnP, TF broadcasting, and debug image output.",
+    code: String.raw`#!/usr/bin/env python3
+"""
+AR Tag Detector Service Node for RealSense
+Controllable AR tag detection with start & stop service
+"""
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import Image, CameraInfo
+from geometry_msgs.msg import TransformStamped
+from std_srvs.srv import SetBool
+from cv_bridge import CvBridge
+from tf2_ros import TransformBroadcaster
+import cv2
+import numpy as np
 
 
-export async function POST(request: NextRequest) {
-    const payload = await request.json();
-    if (!payload?.tag) {
-        return new Response("Missing tag", { status: 400 });
-    }
+class ARTagDetectorService(Node):
+    def __init__(self):
+        super().__init__('ar_tag_detector_service')
+        
+        # Detection state
+        self.detection_enabled = False
+        
+        # Declare parameters - 4x4, 50mm tags
+        self.declare_parameter('marker_size', 0.05)
+        self.declare_parameter('aruco_dict', 'DICT_4X4_50')
+        self.declare_parameter('camera_frame_id', 'camera_color_optical_frame')
+        self.declare_parameter('realsense_rgb_topic', '/camera/realsense2_camera_node/color/image_raw')
+        self.declare_parameter('realsense_camera_info_topic', '/camera/realsense2_camera_node/color/camera_info')
+        
+        # Get parameters
+        self.marker_size = self.get_parameter('marker_size').get_parameter_value().double_value
+        aruco_dict_name = self.get_parameter('aruco_dict').get_parameter_value().string_value
+        self.camera_frame_id = self.get_parameter('camera_frame_id').get_parameter_value().string_value
+        rgb_topic = self.get_parameter('realsense_rgb_topic').get_parameter_value().string_value
+        camera_info_topic = self.get_parameter('realsense_camera_info_topic').get_parameter_value().string_value
+        
+        # Initialize ArUco detector with tuned parameters for better detection
+        self.aruco_dict = self.get_aruco_dict(aruco_dict_name)
+        self.aruco_params = self._create_tuned_detector_params()
+        self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.aruco_params)
+        
+        # Logs for debugging purposes
+        self.get_logger().info('AR Tag Detector Service Node')
+        self.get_logger().info(f'ArUco dictionary: {aruco_dict_name}')
+        self.get_logger().info(f'Marker size: {self.marker_size*1000:.1f}mm')
+        self.get_logger().info(f'Camera frame: {self.camera_frame_id}')
+        self.get_logger().info(f'RGB topic: {rgb_topic}')
+        
+        # Initialization
+        self.bridge = CvBridge()
+        self.tf_broadcaster = TransformBroadcaster(self)
+        self.camera_matrix = None
+        self.dist_coeffs = None
+        
+        # Service for start/stop control
+        self.control_service = self.create_service(
+            SetBool,
+            'ar_tag_detection_enable',
+            self.enable_detection_callback
+        )
+        
+        # Subscribe to RealSense topics
+        self.image_sub = self.create_subscription(
+            Image,
+            rgb_topic,
+            self.image_callback,
+            1
+        )
+        
+        self.camera_info_sub = self.create_subscription(
+            CameraInfo,
+            camera_info_topic,
+            self.camera_info_callback,
+            1
+        )
+        
+        # Create publishers
+        self.debug_image_pub = self.create_publisher(Image, 'ar_tag_debug_image', 10)
+        
+        # Import MarkerArray for visualization
+        from visualization_msgs.msg import Marker, MarkerArray
+        self.marker_pub = self.create_publisher(MarkerArray, 'ar_tag_markers', 10)
+        
+        # Detection statistics
+        self.last_detection_count = 0
+        self.last_detected_ids = []
+        
+        self.get_logger().info('AR Tag Detector ready (detection DISABLED)')
+        self.get_logger().info('  Call service: ros2 service call /ar_tag_detection_enable std_srvs/srv/SetBool "{data: true}"')
+        
+    
+    def enable_detection_callback(self, request, response):
+        """Service callback to enable & disable detection"""
+        self.detection_enabled = request.data
+        
+        if self.detection_enabled:
+            self.get_logger().info('AR Tag Detection ENABLED')
+            response.success = True
+            response.message = 'AR tag detection enabled'
+        else:
+            self.get_logger().info('AR Tag Detection DISABLED')
+            response.success = True
+            response.message = 'AR tag detection disabled'
+        
+        return response
+    
+    def _create_tuned_detector_params(self):
+        """
+        Create ArUco detector parameters tuned for reliable detection.
+        Establish balance between detection rate and false positive rejection.
+        """
+        params = cv2.aruco.DetectorParameters()
+        
+        # Adaptive Thresholding
+        params.adaptiveThreshWinSizeMin = 5      
+        params.adaptiveThreshWinSizeMax = 21     
+        params.adaptiveThreshWinSizeStep = 4    
+        params.adaptiveThreshConstant = 7        
+        
+        # Contour Filtering (reducing false positives)
+        params.minMarkerPerimeterRate = 0.03     
+        params.maxMarkerPerimeterRate = 4.0      
+        params.polygonalApproxAccuracyRate = 0.03  
+        params.minCornerDistanceRate = 0.05      
+        params.minDistanceToBorder = 3           
+        
+        # Corner refinement (increasing pose accuracy)
+        params.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+        params.cornerRefinementWinSize = 5       
+        params.cornerRefinementMaxIterations = 30  
+        params.cornerRefinementMinAccuracy = 0.1  
+        
+        # Bit extraction 
+        params.markerBorderBits = 1              
+        params.minOtsuStdDev = 5.0               
+        params.perspectiveRemovePixelPerCell = 4  # Default
+        params.perspectiveRemoveIgnoredMarginPerCell = 0.13
+        
+        # Error correction (reducing false positives)
+        params.maxErroneousBitsInBorderRate = 0.35 
+        params.errorCorrectionRate = 0.6            
 
-    await revalidateTag(payload.tag);
-    return new Response(JSON.stringify({ ok: true }), {
-        headers: { "Content-Type": "application/json" },
-    });
-}
+        return params
+    
+    def get_aruco_dict(self, dict_name):
+        """Get ArUco dictionary from corresponding name"""
+        aruco_dicts = {
+            'DICT_4X4_50': cv2.aruco.DICT_4X4_50,
+            'DICT_4X4_100': cv2.aruco.DICT_4X4_100,
+            'DICT_5X5_50': cv2.aruco.DICT_5X5_50,
+            'DICT_6X6_50': cv2.aruco.DICT_6X6_50,
+        }
+        
+        if dict_name not in aruco_dicts:
+            self.get_logger().warn(f'Unknown ArUco dictionary: {dict_name}, using DICT_4X4_50')
+            return cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+        
+        return cv2.aruco.getPredefinedDictionary(aruco_dicts[dict_name])
+    
+    def camera_info_callback(self, msg):
+        """Extract camera calibration from CameraInfo message"""
+        if self.camera_matrix is None:
+            self.camera_matrix = np.array(msg.k).reshape(3, 3)
+            self.dist_coeffs = np.array(msg.d)
+            self.get_logger().info(f'Camera calibration received ({msg.width}x{msg.height})')
+    
+    def image_callback(self, msg):
+        """Process incoming image and detect AR tags present"""
+        # Skip if detection is disabled
+        if not self.detection_enabled:
+            return
+        
+        if self.camera_matrix is None:
+            self.get_logger().warn('Waiting for camera calibration...', throttle_duration_sec=2.0)
+            return
+        
+        # Convert ROS Image to OpenCV
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        except Exception as e:
+            self.get_logger().error(f'Failed to convert image: {e}')
+            return
+        
+        # Convert to grayscale for detection
+        gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+        
+        # Image preprocessing for better detection in varied lighting
+        # Utilizes CLAHE (Contrast Limited Adaptive Histogram Equalization)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        enhanced = clahe.apply(gray)
+        
+        # Detect markers on enhanced image
+        corners, ids, rejected = self.detector.detectMarkers(enhanced)
+        
+        # Create debug image
+        debug_image = cv_image.copy()
+    
+        status_text = "AR Detection: ACTIVE"
+        cv2.putText(debug_image, status_text, (10, 30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+        
+        if ids is not None and len(ids) > 0:
+            # Draw detected markers
+            cv2.aruco.drawDetectedMarkers(debug_image, corners, ids)
+            
+            # Create marker array for RViz visualization
+            from visualization_msgs.msg import Marker, MarkerArray
+            marker_array = MarkerArray()
+            
+            # Process each detected marker
+            for i, marker_id in enumerate(ids.flatten()):
+                # Filter out invalid marker IDs 
+                if marker_id > 11:
+                    continue
+                # Estimate pose
+                obj_points = np.array([
+                    [-self.marker_size/2, self.marker_size/2, 0],
+                    [self.marker_size/2, self.marker_size/2, 0],
+                    [self.marker_size/2, -self.marker_size/2, 0],
+                    [-self.marker_size/2, -self.marker_size/2, 0]
+                ], dtype=np.float32)
+                
+                img_points = corners[i][0]
+                
+                success, rvec, tvec = cv2.solvePnP(
+                    obj_points,
+                    img_points,
+                    self.camera_matrix,
+                    self.dist_coeffs,
+                    flags=cv2.SOLVEPNP_IPPE_SQUARE
+                )
+                
+                if not success:
+                    continue
+                
+                # Filter out detections that are too far (likely false positives)
+                distance = float(np.linalg.norm(tvec))
+                if distance > 1.5:  
+                    continue
+                if distance < 0.05:  
+                    continue
+                
+                cv2.drawFrameAxes(
+                    debug_image,
+                    self.camera_matrix,
+                    self.dist_coeffs,
+                    rvec,
+                    tvec,
+                    self.marker_size * 0.5
+                )
+                
+                # Broadcast TF
+                self.broadcast_tf(marker_id, rvec, tvec, msg.header.stamp)
+                
+                # Create visualization marker (green square)
+                vis_marker = self.create_visualization_marker(
+                    marker_id,
+                    tvec.flatten(),
+                    rvec,
+                    msg.header.stamp
+                )
+                marker_array.markers.append(vis_marker)
+                
+                # Add text with distance
+                corner = corners[i][0]
+                distance = float(np.linalg.norm(tvec))
+                cv2.putText(
+                    debug_image,
+                    f'ID: {marker_id} ({distance*1000:.0f}mm)',
+                    (int(corner[0][0]), int(corner[0][1]) - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    (0, 255, 0),
+                    2
+                )
+            
+            # Publish marker array for RViz
+            self.marker_pub.publish(marker_array)
+            
+            # Update detection statistics
+            detected_ids = ids.flatten().tolist()
+            if detected_ids != self.last_detected_ids:
+                self.get_logger().info(f'Detected markers: {detected_ids}')
+                self.last_detected_ids = detected_ids
+        else:
+            # No markers detected
+            if self.last_detected_ids:
+                self.get_logger().info('No markers detected')
+                self.last_detected_ids = []
+        
+        # Publish debug image
+        try:
+            debug_msg = self.bridge.cv2_to_imgmsg(debug_image, encoding='bgr8')
+            debug_msg.header = msg.header
+            self.debug_image_pub.publish(debug_msg)
+        except Exception as e:
+            self.get_logger().error(f'Failed to publish debug image: {e}')
+    
+    def broadcast_tf(self, marker_id, rvec, tvec, timestamp):
+        """Broadcast TF transform for detected marker"""
+        t = TransformStamped()
+        t.header.stamp = timestamp
+        t.header.frame_id = self.camera_frame_id
+        t.child_frame_id = f'ar_marker_{marker_id}'
+        
+        # Translation
+        tvec_flat = tvec.flatten()
+        t.transform.translation.x = float(tvec_flat[0])
+        t.transform.translation.y = float(tvec_flat[1])
+        t.transform.translation.z = float(tvec_flat[2])
+        
+        # Rotation (convert from Rodrigues to quaternion)
+        rotation_matrix, _ = cv2.Rodrigues(rvec)
+        quaternion = self.rotation_matrix_to_quaternion(rotation_matrix)
+        
+        t.transform.rotation.x = quaternion[0]
+        t.transform.rotation.y = quaternion[1]
+        t.transform.rotation.z = quaternion[2]
+        t.transform.rotation.w = quaternion[3]
+        
+        self.tf_broadcaster.sendTransform(t)
+    
+    def rotation_matrix_to_quaternion(self, R):
+        """Convert rotation matrix to quaternion"""
+        trace = np.trace(R)
+        
+        if trace > 0:
+            s = 0.5 / np.sqrt(trace + 1.0)
+            w = 0.25 / s
+            x = (R[2, 1] - R[1, 2]) * s
+            y = (R[0, 2] - R[2, 0]) * s
+            z = (R[1, 0] - R[0, 1]) * s
+        elif R[0, 0] > R[1, 1] and R[0, 0] > R[2, 2]:
+            s = 2.0 * np.sqrt(1.0 + R[0, 0] - R[1, 1] - R[2, 2])
+            w = (R[2, 1] - R[1, 2]) / s
+            x = 0.25 * s
+            y = (R[0, 1] + R[1, 0]) / s
+            z = (R[0, 2] + R[2, 0]) / s
+        elif R[1, 1] > R[2, 2]:
+            s = 2.0 * np.sqrt(1.0 + R[1, 1] - R[0, 0] - R[2, 2])
+            w = (R[0, 2] - R[2, 0]) / s
+            x = (R[0, 1] + R[1, 0]) / s
+            y = 0.25 * s
+            z = (R[1, 2] + R[2, 1]) / s
+        else:
+            s = 2.0 * np.sqrt(1.0 + R[2, 2] - R[0, 0] - R[1, 1])
+            w = (R[1, 0] - R[0, 1]) / s
+            x = (R[0, 2] + R[2, 0]) / s
+            y = (R[1, 2] + R[2, 1]) / s
+            z = 0.25 * s
+        
+        return [x, y, z, w]
+    
+    def create_visualization_marker(self, marker_id, position, rvec, timestamp):
+        """Create a visualization marker for RViz (green square)"""
+        from visualization_msgs.msg import Marker
+        
+        marker = Marker()
+        marker.header.frame_id = self.camera_frame_id
+        marker.header.stamp = timestamp
+        marker.ns = 'ar_markers'
+        marker.id = int(marker_id)
+        marker.type = Marker.CUBE
+        marker.action = Marker.ADD
+        
+        # Position
+        marker.pose.position.x = float(position[0])
+        marker.pose.position.y = float(position[1])
+        marker.pose.position.z = float(position[2])
+        
+        # Orientation from rotation vector
+        rotation_matrix, _ = cv2.Rodrigues(rvec)
+        quaternion = self.rotation_matrix_to_quaternion(rotation_matrix)
+        marker.pose.orientation.x = quaternion[0]
+        marker.pose.orientation.y = quaternion[1]
+        marker.pose.orientation.z = quaternion[2]
+        marker.pose.orientation.w = quaternion[3]
+        
+        # Scale (marker size as a thin square)
+        marker.scale.x = self.marker_size
+        marker.scale.y = self.marker_size
+        marker.scale.z = 0.001  # Thin square (1mm thickness)
+        
+        # Color (green with some transparency)
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0
+        marker.color.a = 0.7
+        
+        # Lifetime (markers disappear after 0.5 seconds if not updated)
+        marker.lifetime.sec = 0
+        marker.lifetime.nanosec = 500000000  
+        
+        return marker
 
-export const dynamic = "force-dynamic";`,
-  },
-  {
-    value: "deploy-script",
-    label: "deploy.sh",
-    language: "bash",
-    description:
-      "Deployment script that installs dependencies, builds the site, and syncs static assets to the robot operator console.",
-    code: String.raw`#!/usr/bin/env bash
-set -euo pipefail
 
-pnpm install --frozen-lockfile
-pnpm run build
+def main(args=None):
+    rclpy.init(args=args)
+    node = ARTagDetectorService()
+    
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-rsync -avz --delete \
-    ./.next \
-    public \
-    package.json \
-    user@robot:/opt/grocerygizmo/site/
 
-echo "Deployment finished ✅"`,
+if __name__ == '__main__':
+    main()
+`,
   },
 ];
 
@@ -1070,14 +1646,14 @@ export default function Page() {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => scrollTo("project")}
+                  onClick={() => scrollTo("introduction")}
                 >
                   View Project Details
                 </Button>
                 <Button
                   variant="outlined"
                   size="large"
-                  onClick={() => scrollTo("gallery")}
+                  onClick={() => scrollTo("viewer")}
                 >
                   View Gallery
                 </Button>
@@ -1671,18 +2247,17 @@ export default function Page() {
                 Code
               </Typography>
               <Typography sx={{ color: "grey.400", mb: 4 }}>
-                Take a look at a few representative snippets that launch perception, refresh dashboards, and deploy GroceryGizmo with a single command.
+                Browse a few representative Python files from the ROS 2 stack: launch orchestration, AR tag detection, package entry points, and linter tests.
               </Typography>
 
-              <Grid container spacing={4} alignItems="stretch">
-                <Grid size={{ xs: 12, md: 5 }}>
+              <Grid container spacing={3} direction="column">
+                <Grid size={{ xs: 12 }}>
                   <ScrollReactiveCard
                     accentKey="code-controls"
                     effectVariant="slide"
                     sx={{
                       borderRadius: 3,
                       border: "1px solid rgba(255,255,255,0.08)",
-                      height: "100%",
                     }}
                   >
                     <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -1694,7 +2269,7 @@ export default function Page() {
                           Select a file to explore
                         </Typography>
                         <Typography sx={{ color: "grey.300", mt: 1.5, lineHeight: 1.7 }}>
-                          These three files illustrate key parts of the system: the ROS launch file, a web API route for cache invalidation, and a deployment helper script.
+                          These samples highlight key parts of the system: ROS launch orchestration, AR tag detection, package configuration, and supporting utilities.
                         </Typography>
                       </Box>
 
@@ -1728,13 +2303,12 @@ export default function Page() {
                   </ScrollReactiveCard>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 7 }}>
+                <Grid size={{ xs: 12 }}>
                   <ScrollReactiveCard
                     accentKey={`code-${selectedSample.language}`}
                     accentColor={codeTheme.badgeText}
                     effectVariant="prism"
                     sx={{
-                      height: "100%",
                       borderRadius: 3,
                       border: `1px solid ${codeTheme.border}`,
                       boxShadow: codeTheme.glow,
